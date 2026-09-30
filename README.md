@@ -16,7 +16,7 @@ contexto de lluvia (pronóstico vs. precipitación observada) y trazabilidad del
 
 ## Grupo
 
-- Alexander Aguilar
+- Alex Aguilar
 - Ethan González
 - José Brown
 - *(nombres del resto del grupo — pendientes, se agregan cuando los confirme José)*
