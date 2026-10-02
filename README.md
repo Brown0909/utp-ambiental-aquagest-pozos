@@ -25,7 +25,7 @@ contexto de lluvia (pronóstico vs. precipitación observada) y trazabilidad del
 
 | Archivo | Qué contiene |
 |---|---|
-| [`AquaGest_Pozos_Prototipo_Figma.pdf`](./AquaGest_Pozos_Prototipo_Figma.pdf) | Exportación de las 12 pantallas del prototipo de Figma, ya con el módulo de pozos integrado |
+| [`AquaGest_Pozos_Prototipo_Figma.pdf`](./AquaGest_Pozos_Prototipo_Figma.pdf) | Exportación de las 27 pantallas del prototipo de Figma (AquaGest + Pozos), incluyendo roles institucionales, cadena de custodia y evaluación normativa |
 | [`Integracion_AquaGest_Pozos.pdf`](./Integracion_AquaGest_Pozos.pdf) | Propuesta conceptual de la integración: flujo de información (técnico → registro → laboratorio → historial), fuente del contexto de lluvia, y cómo se ven las pantallas. Es la base que se usó para instruir al agente de diseño en Figma. |
 
 ## Archivo de Figma (fuente editable)
