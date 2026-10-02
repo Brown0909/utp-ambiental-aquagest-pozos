@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaGest + Pozos — UTP Ingeniería Ambiental</title>
+<style>
+  :root{
+    --bg:#f7faf9; --ink:#12312b; --accent:#1a3c34; --accent2:#2e6b5e;
+    --card:#ffffff; --border:#dce8e4; --muted:#5b6b67;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  header{background:var(--accent);color:#fff;padding:48px 20px 40px}
+  header .wrap{max-width:980px;margin:0 auto}
+  header p.kicker{text-transform:uppercase;letter-spacing:.08em;font-size:12px;opacity:.8;margin:0 0 8px}
+  header h1{margin:0 0 12px;font-size:clamp(24px,4vw,36px)}
+  header p.lead{max-width:640px;color:#dfeee9;margin:0 0 20px}
+  .badge{display:inline-block;background:#0f2b25;border:1px solid #2e6b5e;color:#bfe3d6;
+    font-size:12px;padding:4px 10px;border-radius:999px;margin-right:8px}
+  main{max-width:980px;margin:0 auto;padding:32px 20px 64px}
+  section{margin-bottom:40px}
+  h2{color:var(--accent);font-size:20px;border-bottom:2px solid var(--border);padding-bottom:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px}
+  .grid a{display:block;text-decoration:none}
+  .grid figure{margin:0;background:var(--card);border:1px solid var(--border);border-radius:10px;
+    overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
+  .grid figure:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(26,60,52,.12)}
+  .grid img{width:100%;display:block;border-bottom:1px solid var(--border)}
+  .grid figcaption{padding:8px 10px;font-size:12px;color:var(--muted)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card h3{margin:0 0 8px;font-size:15px;color:var(--accent2)}
+  .card p{margin:0 0 10px;color:var(--muted);font-size:14px}
+  .card a.btn{display:inline-block;font-size:13px;font-weight:600;color:var(--accent2);
+    text-decoration:none;border-bottom:1px solid var(--accent2)}
+  ul.spec-list{padding-left:18px;margin:0}
+  ul.spec-list li{margin-bottom:6px}
+  footer{max-width:980px;margin:0 auto;padding:0 20px 48px;color:var(--muted);font-size:13px}
+  .note{background:#fff7e6;border:1px solid #f0d99a;border-radius:10px;padding:14px 16px;
+    font-size:14px;color:#6b5116}
+  a{color:var(--accent2)}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1613; --ink:#e7f2ee; --card:#152420; --border:#21332d; --muted:#9db3ac;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1613; --ink:#e7f2ee; --card:#152420; --border:#21332d; --muted:#9db3ac;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">Universidad Tecnológica de Panamá · Ingeniería Ambiental</p>
+    <h1>AquaGest + Módulo de Pozos</h1>
+    <p class="lead">Sistema de gestión de muestreo ambiental, ampliado con monitoreo de nitratos en
+      pozos rurales y contexto de lluvia, para apoyar a las Juntas Administradoras de Acueductos
+      Rurales (JAAR) de Panamá.</p>
+    <span class="badge">Propuesta conceptual</span>
+    <span class="badge">Proyecto universitario</span>
+    <div style="margin-top:18px">
+      <a href="app.html" style="display:inline-block;background:#fff;color:var(--accent);
+        font-weight:700;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:14px">
+        ▶ Abrir demo interactiva
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <div class="note">
+      Esta página presenta el <strong>diseño de interfaz</strong> del proyecto y una
+      <a href="app.html">demo interactiva</a> (sin base de datos real — ver <code>spec 001</code>).
+      Es una propuesta conceptual para revisar con el grupo, no un sistema en producción.
+    </div>
+  </section>
+
+  <section>
+    <h2>Pantallas del prototipo</h2>
+    <div class="grid">
+      <a href="assets/pantalla-01.png" target="_blank"><figure><img src="assets/pantalla-01.png" alt="Pantalla 1"><figcaption>1 · Registrar muestra</figcaption></figure></a>
+      <a href="assets/pantalla-02.png" target="_blank"><figure><img src="assets/pantalla-02.png" alt="Pantalla 2"><figcaption>2</figcaption></figure></a>
+      <a href="assets/pantalla-03.png" target="_blank"><figure><img src="assets/pantalla-03.png" alt="Pantalla 3"><figcaption>3</figcaption></figure></a>
+      <a href="assets/pantalla-04.png" target="_blank"><figure><img src="assets/pantalla-04.png" alt="Pantalla 4"><figcaption>4</figcaption></figure></a>
+      <a href="assets/pantalla-05.png" target="_blank"><figure><img src="assets/pantalla-05.png" alt="Pantalla 5"><figcaption>5</figcaption></figure></a>
+      <a href="assets/pantalla-06.png" target="_blank"><figure><img src="assets/pantalla-06.png" alt="Pantalla 6"><figcaption>6</figcaption></figure></a>
+      <a href="assets/pantalla-07.png" target="_blank"><figure><img src="assets/pantalla-07.png" alt="Pantalla 7"><figcaption>7</figcaption></figure></a>
+      <a href="assets/pantalla-08.png" target="_blank"><figure><img src="assets/pantalla-08.png" alt="Pantalla 8"><figcaption>8</figcaption></figure></a>
+      <a href="assets/pantalla-09.png" target="_blank"><figure><img src="assets/pantalla-09.png" alt="Pantalla 9"><figcaption>9</figcaption></figure></a>
+      <a href="assets/pantalla-10.png" target="_blank"><figure><img src="assets/pantalla-10.png" alt="Pantalla 10"><figcaption>10</figcaption></figure></a>
+      <a href="assets/pantalla-11.png" target="_blank"><figure><img src="assets/pantalla-11.png" alt="Pantalla 11"><figcaption>11</figcaption></figure></a>
+      <a href="assets/pantalla-12.png" target="_blank"><figure><img src="assets/pantalla-12.png" alt="Pantalla 12"><figcaption>12</figcaption></figure></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Documentación del proyecto</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Demo interactiva</h3>
+        <p>La app funcionando: registrar muestra, cargar resultado, ver el semáforo y el historial
+          en vivo. Sin base de datos real.</p>
+        <a class="btn" href="app.html">Abrir demo →</a>
+      </div>
+      <div class="card">
+        <h3>Constitución del proyecto</h3>
+        <p>Principios no negociables: qué es, qué no es, y qué límites técnicos y de datos rigen
+          todo el desarrollo.</p>
+        <a class="btn" href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos/blob/main/spec/constitucion.md">Ver constitucion.md →</a>
+      </div>
+      <div class="card">
+        <h3>Especificación funcional (Spec 001)</h3>
+        <p>Requisitos en notación EARS: qué debe hacer el sistema, caso por caso.</p>
+        <a class="btn" href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos/blob/main/spec/001-simulacion-interactiva-pozos/spec.md">Ver spec.md →</a>
+      </div>
+      <div class="card">
+        <h3>Plan técnico</h3>
+        <p>Cómo se construyó: archivos, decisiones y estrategia de pruebas de cada requisito.</p>
+        <a class="btn" href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos/blob/main/spec/001-simulacion-interactiva-pozos/plan.md">Ver plan.md →</a>
+      </div>
+      <div class="card">
+        <h3>Tareas de implementación</h3>
+        <p>El plan dividido en pasos concretos, cada uno con su prueba.</p>
+        <a class="btn" href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos/blob/main/spec/001-simulacion-interactiva-pozos/tasks.md">Ver tasks.md →</a>
+      </div>
+      <div class="card">
+        <h3>Documento de integración</h3>
+        <p>La propuesta conceptual original: cómo se une el módulo de pozos a AquaGest.</p>
+        <a class="btn" href="../Integracion_AquaGest_Pozos.pdf">Ver PDF →</a>
+      </div>
+      <div class="card">
+        <h3>Prototipo completo (PDF)</h3>
+        <p>Las 12 pantallas exportadas de Figma, en un solo documento descargable.</p>
+        <a class="btn" href="../AquaGest_Pozos_Prototipo_Figma.pdf">Ver PDF →</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Marco normativo (Panamá)</h2>
+    <ul class="spec-list">
+      <li><strong>Reglamento Técnico DGNTI-COPANIT 21-2019</strong> — Valor Máximo Permitido de
+        nitrato en agua potable. Aplica a cualquier sistema de abastecimiento, incluidos los
+        pozos rurales.</li>
+      <li><strong>Decreto Ejecutivo N.º 1839 (2014)</strong> — marco regulatorio de las Juntas
+        Administradoras de Acueductos Rurales (JAAR).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Grupo</h2>
+    <p>Alexander Aguilar · Ethan González · José Brown · <em>(resto del grupo, pendiente)</em></p>
+  </section>
+
+</main>
+
+<footer>
+  Repositorio: <a href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos">github.com/gerencia317/utp-ambiental-aquagest-pozos</a>
+  — Proyecto universitario, UTP Ingeniería Ambiental. No es trabajo de BEC ni de clientes.
+</footer>
+
+</body>
+</html>

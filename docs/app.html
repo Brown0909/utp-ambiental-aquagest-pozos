@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaGest + Pozos — Demo interactiva</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+  integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+  integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw"
+  crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#f7faf9; --ink:#12312b; --accent:#1a3c34; --accent2:#2e6b5e;
+    --card:#ffffff; --border:#dce8e4; --muted:#5b6b67;
+    --verde:#1f9d55; --verde-bg:#e6f7ec;
+    --amarillo:#b8860b; --amarillo-bg:#fff6de;
+    --rojo:#c62828; --rojo-bg:#fdecea;
+    --gris:#6b7280; --gris-bg:#eef0f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+    padding-bottom:40px}
+  header{background:var(--accent);color:#fff;padding:18px 16px}
+  header .wrap{max-width:920px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;
+    align-items:center;justify-content:space-between}
+  header h1{font-size:17px;margin:0}
+  header p{margin:2px 0 0;font-size:12px;color:#cfe6dd}
+  .role-picker{display:flex;gap:6px;flex-wrap:wrap}
+  .role-picker button{background:#0f2b25;border:1px solid #2e6b5e;color:#cfe6dd;
+    padding:7px 12px;border-radius:999px;font-size:13px;cursor:pointer}
+  .role-picker button.active{background:#fff;color:var(--accent);font-weight:700;border-color:#fff}
+  nav.tabs{max-width:920px;margin:14px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+  nav.tabs button{background:var(--card);border:1px solid var(--border);color:var(--muted);
+    padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+  nav.tabs button.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+  main{max-width:920px;margin:16px auto 0;padding:0 16px}
+  section.screen{display:none;background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:18px}
+  section.screen.active{display:block}
+  h2{margin:0 0 4px;font-size:18px;color:var(--accent)}
+  p.hint{color:var(--muted);font-size:13px;margin:0 0 16px}
+  label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+  input,select{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;
+    font-size:15px;background:#fff;color:var(--ink)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:480px){.row2{grid-template-columns:1fr}}
+  .btn{margin-top:16px;background:var(--accent2);color:#fff;border:none;padding:11px 18px;
+    border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .ok-box{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--verde-bg);
+    border:1px solid var(--verde);color:#0e5c30;font-size:14px;display:none}
+  input.invalid,select.invalid{border-color:var(--rojo);background:var(--rojo-bg)}
+  .error-text{display:none;color:var(--rojo);font-size:12px;margin-top:4px}
+  .error-text.show{display:block}
+  .error-summary{display:none;margin-top:14px;padding:10px 12px;border-radius:8px;
+    background:var(--rojo-bg);border:1px solid var(--rojo);color:var(--rojo);font-size:13px}
+  .error-summary.show{display:block}
+  .btn-secondary{background:#fff;color:var(--accent2);border:1px solid var(--accent2)}
+  .ref-note{color:var(--muted);font-size:11.5px;font-style:italic}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .b-verde{background:var(--verde-bg);color:var(--verde)}
+  .b-amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
+  .b-rojo{background:var(--rojo-bg);color:var(--rojo)}
+  .b-gris{background:var(--gris-bg);color:var(--gris)}
+  .grid-pozos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;
+    margin-top:14px}
+  .pozo-card{border:1px solid var(--border);border-radius:10px;padding:14px;position:relative}
+  .pozo-card h3{margin:0 0 4px;font-size:14px}
+  .pozo-card p{margin:2px 0;font-size:12.5px;color:var(--muted)}
+  .pozo-card .dot{position:absolute;top:14px;right:14px;width:14px;height:14px;border-radius:50%}
+  .lluvia-box{margin-top:8px;font-size:12px;background:#f2f7f5;border-radius:6px;padding:8px}
+  .lluvia-box b{color:var(--accent2)}
+  .timeline{margin-top:14px;border-left:2px solid var(--border);padding-left:16px}
+  .tl-item{margin-bottom:18px;position:relative}
+  .tl-item::before{content:"";position:absolute;left:-21px;top:4px;width:10px;height:10px;
+    border-radius:50%;background:var(--accent2)}
+  .tl-item h4{margin:0 0 2px;font-size:13.5px}
+  .tl-item p{margin:1px 0;font-size:12.5px;color:var(--muted)}
+  select#filtroPozo{max-width:280px;margin-bottom:6px}
+  .note{background:#fff7e6;border:1px solid #f0d99a;border-radius:8px;padding:10px 12px;
+    font-size:12.5px;color:#6b5116;margin-bottom:14px}
+  footer{max-width:920px;margin:24px auto 0;padding:0 16px;color:var(--muted);font-size:12px}
+  a{color:var(--accent2)}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1613; --ink:#e7f2ee; --card:#152420; --border:#21332d; --muted:#9db3ac;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1613; --ink:#e7f2ee; --card:#152420; --border:#21332d; --muted:#9db3ac;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div>
+      <h1>AquaGest + Pozos — Demo interactiva</h1>
+      <p>Spec 001 · Sin base de datos real: todo corre en tu navegador y se reinicia al recargar</p>
+    </div>
+    <div class="role-picker" id="rolePicker">
+      <button data-role="tecnico">Técnico de campo</button>
+      <button data-role="laboratorio">Laboratorio</button>
+      <button data-role="jaar">Administrador JAAR</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main>
+
+  <section class="screen" id="screen-registrar">
+    <h2>Registrar Muestra</h2>
+    <p class="hint">Técnico de campo · RF-2, RF-3</p>
+    <div class="note">Los datos de esta demo son de ejemplo (ficticios). No representan pozos reales.</div>
+    <label>Pozo *</label>
+    <select id="rm-pozo" required></select>
+    <small class="error-text" id="rm-pozo-err">Elige un pozo de la lista.</small>
+    <div class="row2">
+      <div>
+        <label>Comunidad / JAAR</label>
+        <input id="rm-comunidad" placeholder="Se llena solo al elegir el pozo" readonly>
+      </div>
+      <div>
+        <label>Coordenadas GPS</label>
+        <input id="rm-gps" placeholder="Se llena solo al elegir el pozo" readonly>
+      </div>
+    </div>
+    <div class="row2">
+      <label style="grid-column:1/-1">Clasificación de la muestra</label>
+      <select id="rm-clasificacion" style="grid-column:1/-1">
+        <option value="referencia">Muestra de referencia</option>
+        <option value="seguimiento">Seguimiento después de lluvia</option>
+      </select>
+    </div>
+    <div class="row2">
+      <div>
+        <label>Fecha *</label>
+        <input type="date" id="rm-fecha" required>
+        <small class="error-text" id="rm-fecha-err">La fecha es obligatoria.</small>
+      </div>
+      <div>
+        <label>Hora *</label>
+        <input type="time" id="rm-hora" required>
+        <small class="error-text" id="rm-hora-err">La hora es obligatoria.</small>
+      </div>
+    </div>
+    <label>Foto de campo (opcional, no se guarda en ningún servidor)</label>
+    <input type="file" id="rm-foto" accept="image/*">
+    <button class="btn" id="rm-guardar">Guardar muestra</button>
+    <div class="error-summary" id="rm-error-summary">Revisa los campos marcados en rojo.</div>
+    <div class="ok-box" id="rm-ok"></div>
+  </section>
+
+  <section class="screen" id="screen-lab">
+    <h2>Resultados de Laboratorio</h2>
+    <p class="hint">Laboratorio · RF-4, RF-5, RF-6, RF-7, RF-8</p>
+    <label>Folio de la muestra *</label>
+    <select id="lab-folio" required></select>
+    <small class="error-text" id="lab-folio-err">Elige la muestra a la que pertenece este resultado.</small>
+    <div class="row2">
+      <div>
+        <label>Valor de nitrato *</label>
+        <input type="number" step="0.01" id="lab-valor" placeholder="Ej. 12" required>
+        <small class="error-text" id="lab-valor-err">Escribe un número válido.</small>
+      </div>
+      <div>
+        <label>Unidad reportada</label>
+        <select id="lab-unidad">
+          <option value="NNO3">mg/L como N-NO3 (nitrógeno de nitrato)</option>
+          <option value="NO3">mg/L como NO3⁻ (ion nitrato)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div>
+        <label>Método analítico</label>
+        <input id="lab-metodo" placeholder="Ej. APHA-AWWA-WPCF 4500-NO3-">
+      </div>
+      <div>
+        <label>Laboratorio</label>
+        <input id="lab-laboratorio" placeholder="Ej. Laboratorio Central MINSA">
+      </div>
+    </div>
+    <label>Fecha del análisis *</label>
+    <input type="date" id="lab-fecha" required>
+    <small class="error-text" id="lab-fecha-err">La fecha del análisis es obligatoria.</small>
+    <button class="btn" id="lab-guardar">Guardar resultado</button>
+    <div class="error-summary" id="lab-error-summary">Revisa los campos marcados en rojo.</div>
+    <div class="ok-box" id="lab-ok"></div>
+  </section>
+
+  <section class="screen" id="screen-mapa">
+    <h2>Mapa de Muestreo</h2>
+    <p class="hint">RF-10, RF-11, RF-12 · el color de cada pozo es su estado más reciente</p>
+    <div class="grid-pozos" id="mapa-pozos"></div>
+  </section>
+
+  <section class="screen" id="screen-historial">
+    <h2>Historial y Reportes</h2>
+    <p class="hint">RF-13, RF-14, RF-17, RF-18 · línea de tiempo por pozo: muestras + lluvia + resultados</p>
+    <select id="filtroPozo"></select>
+    <div style="margin:10px 0">
+      <button class="btn btn-secondary" id="btn-exportar-pdf" style="margin-right:8px">⬇ Exportar PDF</button>
+      <button class="btn btn-secondary" id="btn-exportar-excel">⬇ Exportar Excel</button>
+    </div>
+    <div class="timeline" id="historial-lista"></div>
+  </section>
+
+</main>
+
+<footer>
+  Repositorio: <a href="https://github.com/gerencia317/utp-ambiental-aquagest-pozos">github.com/gerencia317/utp-ambiental-aquagest-pozos</a>
+  · <a href="./index.html">← volver a la presentación</a>
+</footer>
+
+<script>
+/* ============================================================
+   ESTADO EN MEMORIA (RF-15: nada se guarda entre visitas — no
+   se usa localStorage ni ningún servidor a propósito)
+   ============================================================ */
+const FACTOR_NO3_A_N = 4.43; // NO3- / N  (62.0 / 14.0)
+
+function crearEstadoInicial(){
+  return {
+    pozos: [
+      {id:1, nombre:"Pozo La Esperanza", comunidad:"Cerro Punta", jaar:"JAAR Cerro Punta", gps:"8.858, -82.573"},
+      {id:2, nombre:"Pozo El Guayabal",  comunidad:"Bajo Mono",   jaar:"JAAR Bajo Mono",   gps:"8.821, -82.541"},
+      {id:3, nombre:"Pozo Quebrada Honda", comunidad:"Nueva Suiza", jaar:"JAAR Nueva Suiza", gps:"8.799, -82.560"},
+      {id:4, nombre:"Pozo Alto Boquete", comunidad:"Alto Boquete", jaar:"JAAR Alto Boquete", gps:"8.775, -82.442"},
+    ],
+    muestras: [
+      {folio:"M-2026-001", pozoId:1, fecha:"2026-09-10", hora:"08:30", clasificacion:"referencia"},
+      {folio:"M-2026-002", pozoId:2, fecha:"2026-09-12", hora:"09:15", clasificacion:"seguimiento"},
+      {folio:"M-2026-003", pozoId:3, fecha:"2026-09-14", hora:"07:50", clasificacion:"seguimiento"},
+      {folio:"M-2026-004", pozoId:4, fecha:"2026-09-15", hora:"10:00", clasificacion:"referencia"},
+    ],
+    resultados: [
+      {folio:"M-2026-001", valor:3.1, unidad:"NNO3", metodo:"APHA 4500-NO3-", laboratorio:"Lab Central MINSA", fecha:"2026-09-13"},
+      {folio:"M-2026-002", valor:12,  unidad:"NNO3", metodo:"APHA 4500-NO3-", laboratorio:"Lab Central MINSA", fecha:"2026-09-16"},
+      {folio:"M-2026-003", valor:8,   unidad:"NNO3", metodo:"APHA 4500-NO3-", laboratorio:"Lab Central MINSA", fecha:"2026-09-18"},
+      // M-2026-004 no tiene resultado todavía -> RF-14 "Pendiente de laboratorio"
+    ],
+    lluvia: [
+      {pozoId:1, fecha:"2026-09-09", pronosticoMm:15, observadoMm:22, fuente:"ETESA Hidrometeorología"},
+      {pozoId:2, fecha:"2026-09-11", pronosticoMm:40, observadoMm:58, fuente:"ETESA Hidrometeorología"},
+      {pozoId:3, fecha:"2026-09-13", pronosticoMm:20, observadoMm:19, fuente:"ETESA Hidrometeorología"},
+      // pozo 4 sin dato a propósito -> RF-11
+    ],
+    proximoFolio: 5,
+  };
+}
+let store = crearEstadoInicial();
+let rolActual = "tecnico";
+let tabActual = null;
+
+const TABS_POR_ROL = {
+  tecnico:     [["registrar","Registrar Muestra"], ["mapa","Mapa de Muestreo"], ["historial","Historial"]],
+  laboratorio: [["lab","Resultados Lab"], ["historial","Historial"]],
+  jaar:        [["mapa","Mapa de Muestreo"], ["historial","Historial"]],
+};
+
+/* ============================================================
+   LÓGICA (RF-5, RF-6, RF-7, RF-8)
+   ============================================================ */
+function convertirANNO3(valor, unidad){
+  return unidad === "NO3" ? valor / FACTOR_NO3_A_N : valor;
+}
+function clasificar(valorNNO3){
+  if (valorNNO3 >= 10) return "rojo";
+  if (valorNNO3 >= 7)  return "amarillo";
+  return "verde";
+}
+function etiquetaEstado(estado){
+  return {rojo:"Riesgo alto", amarillo:"Riesgo medio", verde:"Riesgo bajo", gris:"Sin evaluar", pendiente:"Pendiente de laboratorio"}[estado] || estado;
+}
+function etiquetaUnidad(unidad){
+  return unidad === "NO3" ? "NO3⁻" : "N-NO3";
+}
+/* RF-19: el valor reportado es lo principal; la conversión es solo referencia, nunca silenciosa */
+function textoResultado(resultado){
+  const vConv = convertirANNO3(resultado.valor, resultado.unidad);
+  const estado = clasificar(vConv);
+  return `<b>${resultado.valor} mg/L (${etiquetaUnidad(resultado.unidad)})</b> reportado por el laboratorio `
+    + `<span class="ref-note">— referencia estimada: ${vConv.toFixed(2)} mg/L N-NO3, conversión no verificada</span> `
+    + `<span class="badge b-${estado}">${etiquetaEstado(estado)}</span>`;
+}
+
+/* ============================================================
+   VALIDACIÓN (RF-16): marca en rojo y muestra el mensaje bajo
+   el campo; no deja guardar mientras haya algo inválido.
+   ============================================================ */
+function marcarCampo(input, errId, valido){
+  input.classList.toggle("invalid", !valido);
+  const err = document.getElementById(errId);
+  if (err) err.classList.toggle("show", !valido);
+  return valido;
+}
+function limpiarErrores(ids){
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("invalid");
+  });
+}
+
+function ultimoResultadoDePozo(pozoId){
+  const folios = store.muestras.filter(m => m.pozoId === pozoId).map(m => m.folio);
+  const resultados = store.resultados.filter(r => folios.includes(r.folio));
+  if (resultados.length === 0) return null;
+  return resultados.reduce((a,b) => (a.fecha > b.fecha ? a : b));
+}
+function estadoDePozo(pozoId){
+  const r = ultimoResultadoDePozo(pozoId);
+  if (!r) return "gris";
+  return clasificar(convertirANNO3(r.valor, r.unidad));
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  const tabs = TABS_POR_ROL[rolActual];
+  if (!tabs.find(t => t[0] === tabActual)) tabActual = tabs[0][0];
+  tabs.forEach(([id,label]) => {
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.className = id === tabActual ? "active" : "";
+    b.onclick = () => { tabActual = id; renderAll(); };
+    nav.appendChild(b);
+  });
+}
+function renderScreens(){
+  ["registrar","lab","mapa","historial"].forEach(id => {
+    document.getElementById("screen-"+id).classList.toggle("active", id === tabActual);
+  });
+}
+function renderSelectPozos(select, incluirVacio){
+  select.innerHTML = (incluirVacio ? '<option value="">Selecciona un pozo…</option>' : "") +
+    store.pozos.map(p => `<option value="${p.id}">${p.nombre} — ${p.comunidad}</option>`).join("");
+}
+function renderFormularioRegistrar(){
+  const sel = document.getElementById("rm-pozo");
+  renderSelectPozos(sel, true);
+  actualizarDatosPozoRegistrar();
+  sel.onchange = actualizarDatosPozoRegistrar;
+  document.getElementById("rm-ok").style.display = "none";
+  document.getElementById("rm-error-summary").classList.remove("show");
+  limpiarErrores(["rm-pozo","rm-fecha","rm-hora"]);
+}
+function actualizarDatosPozoRegistrar(){
+  const val = document.getElementById("rm-pozo").value;
+  const pozo = val ? store.pozos.find(p => p.id === parseInt(val,10)) : null;
+  document.getElementById("rm-comunidad").value = pozo ? `${pozo.comunidad} (${pozo.jaar})` : "";
+  document.getElementById("rm-gps").value = pozo ? pozo.gps : "";
+}
+function renderFormularioLab(){
+  const sel = document.getElementById("lab-folio");
+  const pendientes = store.muestras.filter(m => !store.resultados.find(r => r.folio === m.folio));
+  sel.innerHTML = pendientes.map(m => `<option value="${m.folio}">${m.folio} — ${store.pozos.find(p=>p.id===m.pozoId).nombre}</option>`).join("")
+    || '<option value="">No hay muestras pendientes de resultado</option>';
+  document.getElementById("lab-ok").style.display = "none";
+  document.getElementById("lab-error-summary").classList.remove("show");
+  limpiarErrores(["lab-folio","lab-valor","lab-fecha"]);
+  document.getElementById("lab-valor").value = "";
+  document.getElementById("lab-fecha").value = "";
+}
+function renderMapa(){
+  const cont = document.getElementById("mapa-pozos");
+  cont.innerHTML = "";
+  store.pozos.forEach(p => {
+    const estado = estadoDePozo(p.id);
+    const colorVar = {rojo:"var(--rojo)", amarillo:"var(--amarillo)", verde:"var(--verde)", gris:"var(--gris)"}[estado];
+    const lluvia = store.lluvia.find(l => l.pozoId === p.id);
+    const card = document.createElement("div");
+    card.className = "pozo-card";
+    card.innerHTML = `
+      <div class="dot" style="background:${colorVar}"></div>
+      <h3>${p.nombre}</h3>
+      <p>${p.comunidad} · ${p.jaar}</p>
+      <p>GPS: ${p.gps}</p>
+      <span class="badge b-${estado}">${etiquetaEstado(estado)}</span>
+      <div class="lluvia-box">
+        <b>Contexto de lluvia</b><br>
+        ${lluvia
+          ? `Pronóstico: ${lluvia.pronosticoMm} mm · Precipitación observada: ${lluvia.observadoMm} mm<br><span style="opacity:.7">Fuente: ${lluvia.fuente} · ${lluvia.fecha}</span>`
+          : `<em>Sin dato</em>`
+        }
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+function pozoSeleccionadoEnFiltro(){
+  const filtro = document.getElementById("filtroPozo");
+  const pozoId = filtro.value ? parseInt(filtro.value,10) : null;
+  const pozo = pozoId ? store.pozos.find(p => p.id === pozoId) : null;
+  return {pozoId, nombre: pozo ? pozo.nombre : "Todos los pozos"};
+}
+function obtenerEventos(pozoId){
+  const eventos = [];
+  store.muestras.forEach(m => {
+    if (pozoId && m.pozoId !== pozoId) return;
+    const pozo = store.pozos.find(p => p.id === m.pozoId);
+    eventos.push({fecha:m.fecha, tipo:"Muestra", textoHtml:`${m.folio} registrada en ${pozo.nombre} (${m.clasificacion === "referencia" ? "muestra de referencia" : "seguimiento después de lluvia"})`,
+      textoPlano:`${m.folio} registrada en ${pozo.nombre} (${m.clasificacion === "referencia" ? "muestra de referencia" : "seguimiento después de lluvia"})`});
+    const resultado = store.resultados.find(r => r.folio === m.folio);
+    if (resultado){
+      const vConv = convertirANNO3(resultado.valor, resultado.unidad);
+      const estado = clasificar(vConv);
+      eventos.push({fecha:resultado.fecha, tipo:"Resultado", textoHtml:`${m.folio}: ${textoResultado(resultado)}`,
+        textoPlano:`${m.folio}: ${resultado.valor} mg/L (${etiquetaUnidad(resultado.unidad)}) reportado; referencia ${vConv.toFixed(2)} mg/L N-NO3 (no verificada) - ${etiquetaEstado(estado)}`});
+    } else {
+      eventos.push({fecha:m.fecha, tipo:"Estado", textoHtml:`${m.folio}: <span class="badge b-gris">Pendiente de laboratorio</span>`,
+        textoPlano:`${m.folio}: Pendiente de laboratorio`});
+    }
+  });
+  store.lluvia.forEach(l => {
+    if (pozoId && l.pozoId !== pozoId) return;
+    const pozo = store.pozos.find(p => p.id === l.pozoId);
+    const texto = `Lluvia en ${pozo.nombre}: pronóstico ${l.pronosticoMm} mm, observado ${l.observadoMm} mm (${l.fuente})`;
+    eventos.push({fecha:l.fecha, tipo:"Lluvia", textoHtml:texto, textoPlano:texto});
+  });
+  eventos.sort((a,b) => a.fecha.localeCompare(b.fecha));
+  return eventos;
+}
+function renderHistorial(){
+  const filtro = document.getElementById("filtroPozo");
+  renderSelectPozos(filtro, true);
+  if (!filtro.dataset.bound){
+    filtro.addEventListener("change", renderHistorial);
+    filtro.dataset.bound = "1";
+  }
+  const {pozoId} = pozoSeleccionadoEnFiltro();
+  const eventos = obtenerEventos(pozoId);
+  const cont = document.getElementById("historial-lista");
+  cont.innerHTML = eventos.length ? eventos.map(e => `
+    <div class="tl-item">
+      <h4>${e.fecha} · ${e.tipo}</h4>
+      <p>${e.textoHtml}</p>
+    </div>`).join("") : "<p>No hay eventos para este pozo.</p>";
+}
+
+/* ============================================================
+   EXPORTAR (RF-17, RF-18) — todo corre en el navegador, sin
+   servidor ni cuenta externa.
+   ============================================================ */
+function exportarPDF(){
+  const {pozoId, nombre} = pozoSeleccionadoEnFiltro();
+  const eventos = obtenerEventos(pozoId);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const margen = 14;
+  let y = 18;
+  doc.setFontSize(14);
+  doc.text(`AquaGest + Pozos — Historial: ${nombre}`, margen, y);
+  doc.setFontSize(9);
+  y += 6;
+  doc.text(`Generado: ${new Date().toLocaleString("es-PA")} · Datos de ejemplo (demo sin base de datos real)`, margen, y);
+  y += 10;
+  doc.setFontSize(10);
+  eventos.forEach(e => {
+    const linea = `${e.fecha}  [${e.tipo}]  ${e.textoPlano}`;
+    const partido = doc.splitTextToSize(linea, 180);
+    if (y + partido.length * 5 > 280){ doc.addPage(); y = 18; }
+    doc.text(partido, margen, y);
+    y += partido.length * 5 + 3;
+  });
+  if (eventos.length === 0) doc.text("No hay eventos para este pozo.", margen, y);
+  doc.save(`historial-${nombre.replace(/\s+/g,"_")}.pdf`);
+}
+function exportarExcel(){
+  const {pozoId, nombre} = pozoSeleccionadoEnFiltro();
+  const eventos = obtenerEventos(pozoId);
+  const filas = eventos.map(e => ({Fecha:e.fecha, Tipo:e.tipo, Detalle:e.textoPlano}));
+  const ws = XLSX.utils.json_to_sheet(filas.length ? filas : [{Fecha:"", Tipo:"", Detalle:"No hay eventos para este pozo."}]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Historial");
+  XLSX.writeFile(wb, `historial-${nombre.replace(/\s+/g,"_")}.xlsx`);
+}
+function renderRolePicker(){
+  document.querySelectorAll("#rolePicker button").forEach(b => {
+    b.classList.toggle("active", b.dataset.role === rolActual);
+  });
+}
+function renderAll(){
+  renderRolePicker();
+  renderTabs();
+  renderScreens();
+  if (tabActual === "registrar") renderFormularioRegistrar();
+  if (tabActual === "lab") renderFormularioLab();
+  if (tabActual === "mapa") renderMapa();
+  if (tabActual === "historial") renderHistorial();
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+document.getElementById("rolePicker").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-role]");
+  if (!btn) return;
+  rolActual = btn.dataset.role;
+  tabActual = null;
+  renderAll();
+});
+
+document.getElementById("rm-guardar").addEventListener("click", () => {
+  const pozoVal = document.getElementById("rm-pozo").value;
+  const fechaInput = document.getElementById("rm-fecha");
+  const horaInput = document.getElementById("rm-hora");
+
+  /* RF-16: validar antes de guardar, marcar en rojo lo que falte */
+  const pozoOk  = marcarCampo(document.getElementById("rm-pozo"), "rm-pozo-err", !!pozoVal);
+  const fechaOk = marcarCampo(fechaInput, "rm-fecha-err", !!fechaInput.value);
+  const horaOk  = marcarCampo(horaInput, "rm-hora-err", !!horaInput.value);
+  const resumen = document.getElementById("rm-error-summary");
+  if (!pozoOk || !fechaOk || !horaOk){ resumen.classList.add("show"); return; }
+  resumen.classList.remove("show");
+
+  const pozoId = parseInt(pozoVal, 10);
+  const clasificacion = document.getElementById("rm-clasificacion").value;
+  const fecha = fechaInput.value;
+  const hora = horaInput.value;
+  const folio = `M-2026-${String(store.proximoFolio).padStart(3,"0")}`;
+  store.proximoFolio++;
+  store.muestras.push({folio, pozoId, fecha, hora, clasificacion});
+  const ok = document.getElementById("rm-ok");
+  ok.style.display = "block";
+  ok.textContent = `Muestra guardada con folio ${folio}. Ya aparece en el Historial y quedó "Pendiente de laboratorio" en el Mapa.`;
+  renderFormularioRegistrar();
+});
+
+document.getElementById("lab-guardar").addEventListener("click", () => {
+  const folioSel = document.getElementById("lab-folio");
+  const valorInput = document.getElementById("lab-valor");
+  const fechaInput = document.getElementById("lab-fecha");
+  const valor = parseFloat(valorInput.value);
+
+  /* RF-16: validar antes de guardar */
+  const folioOk = marcarCampo(folioSel, "lab-folio-err", !!folioSel.value);
+  const valorOk = marcarCampo(valorInput, "lab-valor-err", !isNaN(valor));
+  const fechaOk = marcarCampo(fechaInput, "lab-fecha-err", !!fechaInput.value);
+  const resumen = document.getElementById("lab-error-summary");
+  if (!folioOk || !valorOk || !fechaOk){ resumen.classList.add("show"); return; }
+  resumen.classList.remove("show");
+
+  const folio = folioSel.value;
+  const unidad = document.getElementById("lab-unidad").value;
+  const metodo = document.getElementById("lab-metodo").value || "(no especificado)";
+  const laboratorio = document.getElementById("lab-laboratorio").value || "(no especificado)";
+  const fecha = fechaInput.value;
+  const resultado = {folio, valor, unidad, metodo, laboratorio, fecha};
+  store.resultados.push(resultado);
+
+  /* RF-19: el valor reportado va primero; la conversión es solo referencia, nunca en silencio */
+  const ok = document.getElementById("lab-ok");
+  const vConv = convertirANNO3(valor, unidad);
+  const estado = clasificar(vConv);
+  ok.style.display = "block";
+  ok.className = "ok-box";
+  ok.style.background = {rojo:"var(--rojo-bg)", amarillo:"var(--amarillo-bg)", verde:"var(--verde-bg)"}[estado];
+  ok.style.borderColor = {rojo:"var(--rojo)", amarillo:"var(--amarillo)", verde:"var(--verde)"}[estado];
+  ok.style.color = {rojo:"var(--rojo)", amarillo:"var(--amarillo)", verde:"var(--verde)"}[estado];
+  ok.innerHTML = `Resultado guardado: ${textoResultado(resultado)}. El Mapa y el Historial ya lo reflejan.`;
+  renderFormularioLab();
+});
+
+document.getElementById("btn-exportar-pdf").addEventListener("click", exportarPDF);
+document.getElementById("btn-exportar-excel").addEventListener("click", exportarExcel);
+
+/* Arranque */
+renderAll();
+</script>
+</body>
+</html>
