@@ -4,6 +4,9 @@
 > **Estado:** APROBADA (30-sep-2026, José, en representación del grupo) · **Tipo:** anclada al código.
 > Solo el QUÉ y el POR QUÉ. El cómo va en `plan.md`.
 
+> **Nota (02-oct-2026):** esta spec fue **reemplazada por la spec 002** (`../002-app-completa-miambiente/`), que cubre las
+> 27 láminas completas. Se conserva como historial; `docs/app.html` ahora solo redirige a la app nueva.
+
 ## Objetivo y porqué
 
 Convertir el prototipo visual de Figma (AquaGest + módulo de pozos rurales/nitratos) en una demo

@@ -1,0 +1,74 @@
+/* AquaGest MiAMBIENTE — base: colores del diseño de Figma, controles y componentes comunes */
+:root {
+  --marino: #0f3c5f; --marino-2: #17527f; --marino-texto: #b9cfe2;
+  --fondo: #eef2f7; --tarjeta: #ffffff; --borde: #dfe6ee; --texto: #0f2233; --suave: #5b6b7c;
+  --primario: #0a7fc8; --primario-os: #086aa8; --primario-bg: #e3f2fb;
+  --ok: #0b7a55; --ok-bg: #d7f7e8; --ok-barra: #12b981;
+  --mal: #b42318; --mal-bg: #fde2e2; --mal-barra: #ef4444;
+  --aviso: #9a5b00; --aviso-bg: #fdf0c9; --aviso-barra: #f59e0b;
+  --gris: #475467; --gris-bg: #eaeef3; --gris-barra: #98a2b3;
+  --radio: 14px; --sombra: 0 1px 2px rgba(15, 34, 51, .06), 0 4px 14px rgba(15, 34, 51, .05);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; }
+h1 { font-size: 24px; } h2 { font-size: 18px; } h3 { font-size: 15px; }
+p { margin: 0; }
+a { color: var(--primario); }
+.ico { flex: none; vertical-align: middle; }
+.suave { color: var(--suave); }
+.chico { font-size: 13px; }
+.negrita { font-weight: 700; }
+.oculto-visual { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid #7cc4ef; outline-offset: 2px; }
+
+/* Botones */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1px solid transparent; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; background: var(--primario); color: #fff; }
+.btn:hover { background: var(--primario-os); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-sec { background: #fff; color: var(--primario); border-color: var(--primario); }
+.btn-sec:hover { background: var(--primario-bg); }
+.btn-neutro { background: #fff; color: var(--texto); border-color: var(--borde); }
+.btn-neutro:hover { background: var(--gris-bg); }
+.btn-peligro { background: #fff; color: var(--mal); border-color: #f3b4ae; }
+.btn-peligro:hover { background: var(--mal-bg); }
+.btn-chico { min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.btn-ancho { width: 100%; }
+.btn-enlace { background: none; border: 0; padding: 0; min-height: 0; color: var(--primario); font-weight: 600; cursor: pointer; font: inherit; }
+
+/* Tarjetas */
+.tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 20px; }
+.tarjeta + .tarjeta { margin-top: 16px; }
+.tarjeta-titulo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.rejilla { display: grid; gap: 16px; }
+.rejilla-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rejilla-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rejilla-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fila { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.fila-entre { justify-content: space-between; }
+.apilado > * + * { margin-top: 12px; }
+
+/* Insignias */
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.b-cumple { background: var(--ok-bg); color: var(--ok); }
+.b-no_cumple { background: var(--mal-bg); color: var(--mal); }
+.b-pendiente { background: var(--aviso-bg); color: var(--aviso); }
+.b-sin_criterio, .b-gris, .b-sin_muestras { background: var(--gris-bg); color: var(--gris); }
+.b-azul { background: var(--primario-bg); color: var(--primario-os); }
+
+/* Avisos */
+.aviso { display: flex; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid; font-size: 14px; }
+.aviso strong { display: block; }
+.aviso-mal { background: var(--mal-bg); border-color: #f6b9b3; color: var(--mal); }
+.aviso-amarillo { background: var(--aviso-bg); border-color: #f1d88e; color: var(--aviso); }
+.aviso-ok { background: var(--ok-bg); border-color: #9fe3c5; color: var(--ok); }
+.aviso-info { background: var(--primario-bg); border-color: #b4dcf3; color: var(--primario-os); }
+.aviso-gris { background: #f6f8fb; border-color: var(--borde); color: var(--gris); }
+
+/* Tablas */
+.tabla-caja { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-weight: 600; color: var(--suave); padding: 8px 10px; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }

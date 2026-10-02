@@ -21,6 +21,17 @@ contexto de lluvia (pronóstico vs. precipitación observada) y trazabilidad del
 - José Brown
 - *(nombres del resto del grupo — pendientes, se agregan cuando los confirme José)*
 
+## ▶ Probar la aplicación (sin cuentas ni instalación)
+
+🔗 **https://brown0909.github.io/utp-ambiental-aquagest-pozos/app/**
+
+Las 27 láminas del prototipo son **17 pantallas** (escritorio + celular) y todas se pueden usar: entrar con un rol,
+registrar pozos y muestras, enviar y recibir en laboratorio, cargar resultados con certificado, evaluar contra la
+norma, confirmar la revisión técnica, ver el mapa, filtrar el historial y descargar PDF/Excel.
+Usuarios de demostración (clave `Aqua2026!`): `carlos.chen@` (Técnico), `ana.rodriguez@` (Laboratorio),
+`maria.castillo@` (Administrador), todos `@miambiente.gob.pa`. **No hay base de datos:** lo que se escribe vive
+en la pestaña y se reinicia al recargar. Pruebas: `npm test` (110 pruebas automáticas).
+
 ## Contenido de este repositorio
 
 | Archivo | Qué contiene |
@@ -41,6 +52,7 @@ contexto de lluvia (pronóstico vs. precipitación observada) y trazabilidad del
 
 ## Alcance y limitaciones
 
-Esta es una **propuesta conceptual para revisar con el grupo** — no representa una integración ya
-implementada en código. No hay datos de campo reales ni un backend funcionando; es el diseño de la
-interfaz y del flujo de información.
+Es una **demostración universitaria con datos ficticios**: no hay datos de campo reales ni backend; la
+aplicación (`docs/app/`) simula el flujo completo en el navegador. El dictamen Cumple/No cumple solo aparece
+tras una revisión técnica humana confirmada, y los límites normativos sin verificar se muestran como
+«Límite no cargado». Metodología: SDD — ver `spec/` (constitución, spec 001 y spec 002).

@@ -1,0 +1,9 @@
+{
+  "name": "utp-ambiental-aquagest-pozos",
+  "private": true,
+  "type": "module",
+  "description": "AquaGest + Pozos (UTP, Ingeniería Ambiental). Las pruebas importan los mismos módulos que carga el navegador.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

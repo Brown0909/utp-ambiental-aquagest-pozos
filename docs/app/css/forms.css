@@ -1,0 +1,51 @@
+/* Formularios: campo con etiqueta, error de texto (RNF-4), pastillas y archivos */
+.campo { margin-bottom: 14px; }
+.campo > label, .campo-titulo { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #243445; }
+.req { color: var(--mal); margin-left: 2px; }
+.campo input, .campo select, .campo textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #c9d4e0; border-radius: 10px; background: #fff; color: var(--texto); font: inherit; font-size: 16px; }
+.campo textarea { min-height: 88px; resize: vertical; }
+.campo input[readonly] { background: #f3f6fa; color: #3b4b5c; }
+.campo input:focus, .campo select:focus, .campo textarea:focus { outline: 3px solid #7cc4ef; outline-offset: 0; border-color: var(--primario); }
+.campo .ayuda { margin-top: 5px; font-size: 12.5px; color: var(--suave); }
+.campo .error { display: none; margin-top: 5px; font-size: 13px; font-weight: 600; color: var(--mal); }
+.campo.con-error .error { display: block; }
+.campo.con-error input, .campo.con-error select, .campo.con-error textarea, .campo.con-error .zona-archivo { border-color: var(--mal-barra); background: #fff7f6; }
+.error-form { display: none; margin: 14px 0; }
+.error-form.visible { display: flex; }
+.entrada-icono { position: relative; }
+.entrada-icono > .ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--suave); }
+.entrada-icono input { padding-left: 42px; }
+.entrada-icono .ver { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; padding: 8px; color: var(--suave); cursor: pointer; border-radius: 8px; }
+
+/* Pastillas (grupo de opciones) */
+.pastillas { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastillas label { flex: 1 1 130px; margin: 0; }
+.pastillas input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pastillas span { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--borde); border-radius: 10px; background: #eef2f7; font-weight: 600; font-size: 14px; cursor: pointer; }
+.pastillas input:checked + span { background: var(--primario); border-color: var(--primario); color: #fff; }
+.pastillas input:focus-visible + span { outline: 3px solid #7cc4ef; outline-offset: 2px; }
+.campo.con-error .pastillas span { border-color: var(--mal-barra); }
+
+/* Casillas */
+.casillas { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.casillas label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; margin: 0; min-height: 36px; cursor: pointer; }
+.casillas input { width: 20px; height: 20px; min-height: 0; accent-color: var(--primario); }
+
+/* Archivo */
+.zona-archivo { border: 2px dashed #b8c7d8; border-radius: 12px; padding: 22px 16px; text-align: center; background: #f8fafc; color: var(--suave); }
+.zona-archivo.arrastrando { border-color: var(--primario); background: var(--primario-bg); }
+.zona-archivo strong { display: block; color: var(--texto); margin: 6px 0 2px; }
+.zona-archivo input[type=file] { display: none; }
+.vista-foto { max-width: 220px; max-height: 160px; border-radius: 10px; border: 1px solid var(--borde); margin-top: 10px; display: block; margin-inline: auto; }
+
+/* Parámetros de campo */
+.parametros { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.parametro { border: 1px solid var(--borde); border-radius: 12px; padding: 10px 12px; }
+.parametro label { font-size: 12px; font-weight: 600; color: var(--suave); display: block; margin-bottom: 2px; }
+.parametro .unidad { font-size: 12px; color: var(--suave); }
+.parametro input { width: 100%; border: 0; min-height: 36px; padding: 2px 0; font: inherit; font-size: 20px; font-weight: 700; background: transparent; }
+.parametro input:focus { outline: 0; box-shadow: none; }
+.parametro .error { color: var(--mal); font-size: 12.5px; font-weight: 600; display: none; }
+.parametro.con-error { border-color: var(--mal-barra); background: #fff7f6; }
+.parametro.con-error .error { display: block; }
+.acciones-form { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }

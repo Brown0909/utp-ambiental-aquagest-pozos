@@ -1,0 +1,51 @@
+/* Elementos propios de cada pantalla */
+#principal:focus, #app:focus { outline: none; }
+.vista-foto[hidden] { display: none; }
+.avisos-flotantes { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 100; max-width: min(92vw, 380px); }
+.aviso-flotante { padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; box-shadow: 0 8px 28px rgba(15, 34, 51, .25); background: #0f2233; color: #fff; }
+.af-ok { background: #0b6b4a; } .af-mal { background: #a3231a; }
+
+/* Panel */
+.rejilla-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.kpi { display: flex; flex-direction: column; gap: 6px; }
+.kpi .cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #243445; font-size: 14px; }
+.kpi .ficha { width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; }
+.kpi .valor { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+.ficha-azul { background: var(--primario-bg); color: var(--primario); } .ficha-verde { background: var(--ok-bg); color: var(--ok); }
+.ficha-roja { background: var(--mal-bg); color: var(--mal); } .ficha-ambar { background: var(--aviso-bg); color: var(--aviso); }
+.barra { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--gris-bg); gap: 2px; }
+.barra > i { display: block; height: 100%; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: 13px; color: #243445; }
+.punto { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.c-cumple { background: var(--ok-barra); } .c-no_cumple { background: var(--mal-barra); } .c-pendiente { background: var(--aviso-barra); } .c-sin_criterio, .c-sin_muestras { background: var(--gris-barra); }
+@media (max-width: 960px) { .rejilla-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .rejilla-kpi { grid-template-columns: minmax(0, 1fr); } }
+
+/* Cronología */
+.linea { list-style: none; margin: 0; padding: 0 0 0 4px; }
+.linea li { display: flex; gap: 12px; position: relative; padding-bottom: 16px; }
+.linea li::before { content: ""; position: absolute; left: 6px; top: 16px; bottom: 0; width: 2px; background: var(--borde); }
+.linea li:last-child::before { display: none; }
+.hito { flex: none; width: 14px; height: 14px; margin-top: 4px; border-radius: 50%; background: var(--primario); border: 3px solid var(--primario-bg); }
+.en-curso .hito { background: var(--aviso-barra); border-color: var(--aviso-bg); }
+.sel-muestra { display: block; padding: 12px; border: 1px solid var(--borde); border-radius: 12px; text-decoration: none; color: inherit; background: #fff; }
+.sel-muestra:hover { background: #f6f9fc; }
+.sel-muestra[aria-current=true] { border-color: var(--primario); box-shadow: 0 0 0 2px var(--primario-bg); }
+.cabecera-punto { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; justify-content: space-between; }
+.id-chip { display: inline-block; background: var(--primario-bg); color: var(--primario-os); border-radius: 8px; padding: 2px 8px; font-weight: 800; font-size: 13px; }
+.paginacion { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 14px; }
+.filtros { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.filtros .campo { margin: 0; }
+@media (max-width: 960px) { .filtros { grid-template-columns: minmax(0, 1fr); } }
+.dos-col { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+@media (max-width: 960px) { .dos-col { grid-template-columns: minmax(0, 1fr); } }
+
+/* Mapa */
+.mapa { height: 460px; border-radius: 12px; border: 1px solid var(--borde); z-index: 0; }
+.pin-caja { background: none; border: 0; }
+.pin { display: block; width: 24px; height: 24px; margin: 5px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .4); position: relative; }
+.pin.reciente { box-shadow: 0 0 0 4px rgba(15, 60, 95, .45), 0 2px 6px rgba(0, 0, 0, .4); }
+.pin.pozo::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff; }
+.leyenda-lista { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.aro { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(15, 60, 95, .55); margin-right: 6px; vertical-align: -1px; }
+@media (max-width: 520px) { .mapa { height: 340px; } }
