@@ -1,10 +1,11 @@
 // Láminas 7 y 17 — Detalle de punto o pozo (RF-25): muestras, cronología, lluvia, resultados y mediciones de campo.
 import { html } from '../ui/dom.js';
 import { icono } from '../ui/icons.js';
-import { coordTexto, profundidadTexto, insigniaMuestra, insigniaClase } from '../ui/formato.js';
+import { coordTexto, profundidadTexto, insigniaMuestra, insigniaClase, num } from '../ui/formato.js';
 import { lineaTiempo, bloqueLluvia, bloqueResultados, bloqueCampo } from '../ui/componentes.js';
 import { fmtDate } from '../core/dates.js';
 import { can } from '../core/permissions.js';
+import { tarjetaComparacion, tarjetaHistorico, montarImportacion } from '../ui/serieHistorica.js';
 
 export default function puntoDetalle(ctx) {
   const { store } = ctx;
@@ -18,7 +19,7 @@ export default function puntoDetalle(ctx) {
     <section class="tarjeta"><div class="cabecera-punto"><div>
       <span class="id-chip">${p.id}</span> <span class="badge b-gris">${p.tipo}</span>
       <h2 style="margin-top:8px">${p.nombre}</h2>
-      <p class="suave">${coordTexto(p.lat, p.lng)} · Comunidad: ${p.comunidad}${p.tipo === 'Pozo' ? html` · Profundidad: ${profundidadTexto(p.profundidad)}` : ''}</p>
+      <p class="suave">${coordTexto(p.lat, p.lng)} · Comunidad: ${p.comunidad}${p.tipo === 'Pozo' ? html` · Profundidad: ${profundidadTexto(p.profundidad)} · Caudal: ${p.caudal === null || p.caudal === undefined ? 'Sin dato' : `${num(p.caudal)} L/s`}` : ''}</p>
       <p class="chico suave">ID permanente · distinto del folio de muestra</p></div>
       <div class="fila">${escribe ? html`<a class="btn" href="#/muestras/nueva?punto=${p.id}">Registrar muestra</a><a class="btn btn-sec" href="#/puntos/${p.id}/editar">Editar ${p.tipo === 'Pozo' ? 'pozo' : 'punto'}</a>` : ''}<a class="btn btn-neutro" href="#/puntos">← Puntos y pozos</a></div></div></section>
     <section class="tarjeta"><h2>Muestras del ${p.tipo === 'Pozo' ? 'pozo' : 'punto'}</h2>
@@ -27,11 +28,14 @@ export default function puntoDetalle(ctx) {
           <div class="fila fila-entre"><strong>${m.folio}</strong><span class="fila">${insigniaClase(m)} ${insigniaMuestra(store, m)}</span></div>
           <div class="chico suave">${fmtDate(m.fechaHora)} · ${m.clasificacion === 'referencia' ? 'Referencia' : 'Seguimiento'}${m.referenciaFolio ? ` · Enlazado a referencia ${m.referenciaFolio}` : ''}</div></a>`)}</div>
         <p class="chico suave" style="margin-top:10px">Referencia y seguimiento conservan folios independientes, vinculados al mismo ID ${p.id}.</p>`}</section>
+    ${p.tipo === 'Pozo' ? tarjetaComparacion(store.comparacionesDePunto(p.id)) : ''}
     ${elegida ? html`
       <div class="rejilla rejilla-2" style="margin-top:16px">
         <section class="tarjeta" style="margin:0"><h2>Cronología · ${elegida.folio}</h2><p class="chico suave" style="margin-bottom:10px">${elegida.referenciaFolio ? `Seguimiento enlazado a ${elegida.referenciaFolio}` : 'Muestra de referencia'}</p>${lineaTiempo(store.cronologia(elegida))}</section>
         <section class="tarjeta" style="margin:0"><h2>Lluvia asociada</h2><p class="chico suave" style="margin-bottom:10px">Lluvia registrada para ${elegida.folio}</p>${bloqueLluvia(elegida)}
           <h2 style="margin-top:20px">Mediciones de campo</h2><div style="margin-top:10px">${bloqueCampo(elegida)}</div></section></div>
-      <section class="tarjeta"><div class="tarjeta-titulo"><h2>Resultados de laboratorio · ${elegida.folio} · ${fmtDate(elegida.fechaHora)}</h2><a class="btn btn-sec btn-chico" href="#/muestras/${elegida.folio}">Ver detalle de la muestra</a></div>${bloqueResultados(elegida)}</section>` : ''}`;
-  return { titulo: `${p.id} · ${p.nombre}`, subtitulo: 'Identidad, muestras enlazadas y trazabilidad del proceso.', contenido };
+      <section class="tarjeta"><div class="tarjeta-titulo"><h2>Resultados de laboratorio · ${elegida.folio} · ${fmtDate(elegida.fechaHora)}</h2><a class="btn btn-sec btn-chico" href="#/muestras/${elegida.folio}">Ver detalle de la muestra</a></div>${bloqueResultados(elegida)}</section>` : ''}
+    ${tarjetaHistorico(store, p, { forma: ctx.consulta.get('forma'), escribe, folioActual: elegida?.folio ?? '' })}`;
+  return { titulo: `${p.id} · ${p.nombre}`, subtitulo: 'Identidad, muestras enlazadas, trazabilidad e histórico con lluvia.', contenido,
+    montar(raiz) { montarImportacion(raiz, ctx, p.id); } };
 }

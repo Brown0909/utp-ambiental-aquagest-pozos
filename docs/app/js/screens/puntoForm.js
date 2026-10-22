@@ -14,7 +14,7 @@ export default function puntoForm(ctx) {
   const edicion = id !== null;
   const punto = edicion ? store.puntoPorId(id) : null;
   if (edicion && !punto) return { titulo: 'No encontrado', contenido: html`<div class="aviso aviso-amarillo">${icono('alerta')}<div>El registro ${id} no existe. <a href="#/puntos">Volver a Puntos y pozos</a></div></div>` };
-  const v = punto ?? { tipo: 'Pozo', nombre: '', comunidad: '', profundidad: '', lat: '', lng: '' };
+  const v = punto ?? { tipo: 'Pozo', nombre: '', comunidad: '', profundidad: '', caudal: '', lat: '', lng: '' };
 
   const contenido = html`<section class="tarjeta"><h2>Datos del registro</h2>
     <p class="suave" style="margin:4px 0 16px">${edicion ? 'Edite los datos. El ID y el tipo no cambian.' : 'Complete el registro antes de asociar muestras.'}</p>
@@ -23,7 +23,8 @@ export default function puntoForm(ctx) {
         : pastillas('tipo', 'Tipo de registro', ['Punto', 'Pozo'], v.tipo, { requerido: true })}
       ${entrada('id', 'ID del punto o pozo', { valor: edicion ? punto.id : siguienteIdPunto(store.data.puntos, v.tipo), lectura: true, ayuda: 'Identidad permanente. No es el folio de la muestra.' })}
       <div class="rejilla rejilla-2">${entrada('nombre', 'Nombre', { valor: v.nombre, requerido: true, largo: 80, placeholder: 'Ej. Pozo Alajuela Norte' })}${entrada('comunidad', 'Comunidad', { valor: v.comunidad, requerido: true, largo: 60 })}</div>
-      <div id="bloque-prof">${entrada('profundidad', 'Profundidad (m)', { valor: v.profundidad ?? '', requerido: true, modo: 'decimal', ayuda: 'Obligatorio únicamente para pozos (entre 0,5 y 500 m).' })}</div>
+      <div id="bloque-prof">${entrada('profundidad', 'Profundidad (m)', { valor: v.profundidad ?? '', requerido: true, modo: 'decimal', ayuda: 'Obligatorio únicamente para pozos (entre 0,5 y 500 m).' })}
+        ${entrada('caudal', 'Caudal (L/s)', { valor: v.caudal ?? '', modo: 'decimal', ayuda: 'Opcional, solo pozos (0 a 500 L/s). Si tiene el dato en galones por minuto, 1 L/s equivale a unos 15,85 gpm.' })}</div>
       <h3 style="margin:8px 0">Ubicación geográfica</h3>
       <p class="chico suave" style="margin-bottom:10px">Capture el GPS o ingrese las coordenadas manualmente (coordenadas decimales, punto o coma).</p>
       <div class="fila" style="margin-bottom:10px"><button type="button" class="btn btn-sec" id="capturar">${icono('navegar', 18)} Capturar ubicación</button><span class="chico suave" id="estado-gps" role="status"></span></div>
@@ -35,7 +36,7 @@ export default function puntoForm(ctx) {
 
   return {
     titulo: edicion ? `Editar ${punto.id}` : 'Alta de punto o pozo',
-    subtitulo: edicion ? 'Actualice nombre, comunidad, profundidad y coordenadas.' : 'Completa el registro antes de asociar muestras.',
+    subtitulo: edicion ? 'Actualice nombre, comunidad, profundidad, caudal y coordenadas.' : 'Completa el registro antes de asociar muestras.',
     contenido,
     montar(raiz) {
       const form = raiz.querySelector('#form-punto');
@@ -47,6 +48,7 @@ export default function puntoForm(ctx) {
         const esPozo = tipoActual() === 'Pozo';
         bloqueProf.hidden = !esPozo;
         form.profundidad.disabled = !esPozo;
+        form.caudal.disabled = !esPozo;
         if (!edicion) campoId.value = siguienteIdPunto(store.data.puntos, tipoActual());
       };
       const vista = () => {

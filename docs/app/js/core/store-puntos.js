@@ -7,6 +7,9 @@ export const TIPOS_REGISTRO = ['Punto', 'Pozo'];
 export const POR_PAGINA = 10;
 const norm = (s) => clean(s).toLowerCase();
 
+/** Caudal en L/s: solo los pozos lo tienen y es opcional (vacío = sin dato). */
+const caudalDe = (v, tipo) => (tipo === 'Pozo' && !isBlank(v.caudal) ? parseNumber(v.caudal) : null);
+
 /** Valida los datos de un punto o pozo. La profundidad solo se pide a los pozos (RF-20). */
 function validarPunto(v, tipo) {
   const errores = validate(v, {
@@ -16,6 +19,8 @@ function validarPunto(v, tipo) {
   if (tipo === 'Pozo') {
     if (isBlank(v.profundidad)) errores.profundidad = 'La profundidad es obligatoria para un pozo.';
     else { const e = number(v.profundidad, { min: 0.5, max: 500, unit: 'm' }); if (e) errores.profundidad = e; }
+    const ec = number(v.caudal, { min: 0, max: 500, unit: 'L/s' });   // caudal opcional (spec 003)
+    if (ec) errores.caudal = ec;
   }
   const c = coordinates(v.lat, v.lng);
   Object.assign(errores, c.errors);
@@ -42,14 +47,14 @@ export default {
     if (hayErrores(errores)) return fallo(errores);
     const punto = {
       id: siguienteIdPunto(this.data.puntos, v.tipo), tipo: v.tipo, nombre: clean(v.nombre), comunidad: clean(v.comunidad),
-      profundidad: v.tipo === 'Pozo' ? parseNumber(v.profundidad) : null, lat, lng, creadoEn: this.ahoraIso(),
+      profundidad: v.tipo === 'Pozo' ? parseNumber(v.profundidad) : null, caudal: caudalDe(v, v.tipo), lat, lng, creadoEn: this.ahoraIso(),
     };
     this.data.puntos.push(punto);
     this.notificar();
     return exito(punto);
   },
 
-  /** RF-24: edita nombre, comunidad, profundidad y coordenadas. El ID y el tipo no cambian. */
+  /** RF-24: edita nombre, comunidad, profundidad, caudal y coordenadas. El ID y el tipo no cambian. */
   editarPunto(id, v) {
     const sinPermiso = this.exigir('registrar_puntos_muestras');
     if (sinPermiso) return sinPermiso;
@@ -60,7 +65,7 @@ export default {
       errores.nombre = 'Ya existe un registro con este nombre en esa comunidad.';
     }
     if (hayErrores(errores)) return fallo(errores);
-    Object.assign(punto, { nombre: clean(v.nombre), comunidad: clean(v.comunidad), profundidad: punto.tipo === 'Pozo' ? parseNumber(v.profundidad) : null, lat, lng });
+    Object.assign(punto, { nombre: clean(v.nombre), comunidad: clean(v.comunidad), profundidad: punto.tipo === 'Pozo' ? parseNumber(v.profundidad) : null, caudal: caudalDe(v, punto.tipo), lat, lng });
     this.notificar();
     return exito(punto);
   },

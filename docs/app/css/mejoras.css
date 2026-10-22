@@ -1,0 +1,16 @@
+/* Spec 003: gráfica del histórico, avisos flotantes en móvil y detalles de la tarjeta de histórico */
+.avisos-flotantes .aviso-flotante { cursor: pointer; }
+@media (max-width: 720px) {
+  /* Arriba (bajo el encabezado) y no abajo: en el móvil el aviso de abajo tapaba los botones de los formularios */
+  .avisos-flotantes { top: 76px; bottom: auto; left: 12px; right: 12px; max-width: none; }
+}
+
+.grafica { margin-top: 4px; }
+.grafica svg { width: 100%; height: auto; display: block; }
+.g-eje { stroke: var(--borde); stroke-width: 1; }
+.g-barra { fill: var(--primario); opacity: .35; }
+.g-linea { fill: none; stroke: var(--texto); stroke-width: 2; stroke-linejoin: round; }
+.g-punto { fill: var(--texto); }
+.g-txt { font-size: 11px; fill: var(--suave); }
+.g-txt-n { fill: var(--texto); }
+details > summary { cursor: pointer; }

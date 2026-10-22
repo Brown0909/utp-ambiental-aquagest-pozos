@@ -6,6 +6,8 @@ export function aviso(mensaje, tipo = 'ok') {
   el.className = `aviso-flotante af-${tipo}`;
   el.setAttribute('role', tipo === 'mal' ? 'alert' : 'status');
   el.textContent = mensaje;
+  el.title = 'Clic para cerrar';
+  el.addEventListener('click', () => el.remove());
   cont.appendChild(el);
-  setTimeout(() => el.remove(), 5500);
+  setTimeout(() => el.remove(), tipo === 'mal' ? 8000 : 3500);   // los errores se leen con más calma
 }

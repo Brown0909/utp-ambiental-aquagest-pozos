@@ -19,11 +19,11 @@ export function construirSeed(ahora = new Date()) {
     { id: 'U4', nombre: 'Luis Mendoza', correo: 'luis.mendoza@miambiente.gob.pa', rol: 'Técnico', estado: 'Inactivo', password: CLAVE_DEMO },
   ];
   const puntos = [
-    { id: 'PZ-018', tipo: 'Pozo', nombre: 'Pozo Alajuela Norte', comunidad: 'Alajuela', profundidad: 9.0, lat: 9.0333, lng: -79.5333, creadoEn: hace(90 * H) },
+    { id: 'PZ-018', tipo: 'Pozo', nombre: 'Pozo Alajuela Norte', comunidad: 'Alajuela', profundidad: 9.0, caudal: 1.4, lat: 9.0333, lng: -79.5333, creadoEn: hace(90 * H) },
     { id: 'PT-001', tipo: 'Punto', nombre: 'Río Chagres - Estación Alajuela', comunidad: 'Alajuela', profundidad: null, lat: 9.12, lng: -79.62, creadoEn: hace(300 * H) },
     { id: 'PT-002', tipo: 'Punto', nombre: 'Planta Potabilizadora Chilibre', comunidad: 'Chilibre', profundidad: null, lat: 9.15, lng: -79.61, creadoEn: hace(300 * H) },
     { id: 'PT-004', tipo: 'Punto', nombre: 'Río Cabra', comunidad: 'Pacora', profundidad: null, lat: 9.1, lng: -79.3, creadoEn: hace(300 * H) },
-    { id: 'PZ-019', tipo: 'Pozo', nombre: 'Pozo Comunitario Alto Boquete', comunidad: 'Boquete', profundidad: 14.0, lat: 8.7799, lng: -82.4418, creadoEn: hace(200 * H) },
+    { id: 'PZ-019', tipo: 'Pozo', nombre: 'Pozo Comunitario Alto Boquete', comunidad: 'Boquete', profundidad: 14.0, caudal: 0.9, lat: 8.7799, lng: -82.4418, creadoEn: hace(200 * H) },
     { id: 'PT-003', tipo: 'Punto', nombre: 'Salida Residual - Zona Libre Colón', comunidad: 'Colón', profundidad: null, lat: 9.3547, lng: -79.9, creadoEn: hace(300 * H) },
     { id: 'PT-005', tipo: 'Punto', nombre: 'Acueducto Rural Cerro Punta', comunidad: 'Cerro Punta', profundidad: null, lat: 8.8467, lng: -82.5667, creadoEn: hace(200 * H) },
   ];

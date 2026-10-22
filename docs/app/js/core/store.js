@@ -14,6 +14,8 @@ import lab from './store-lab.js';
 import revision from './store-revision.js';
 import selectores from './store-selectores.js';
 import alertas from './store-alertas.js';
+import historico from './store-historico.js';
+import { construirHistoricoEjemplo } from './historico.js';
 
 export { fallo, exito, hayErrores };
 
@@ -25,7 +27,8 @@ export class Store {
   }
 
   reiniciar() {
-    this.data = { ...construirSeed(this.ahora()), sesion: { userId: null }, intentos: {}, tokens: [], contador: { solicitud: 0, correo: 0 } };
+    const registrosHistoricos = construirHistoricoEjemplo(this.ahora());
+    this.data = { ...construirSeed(this.ahora()), historico: registrosHistoricos, sesion: { userId: null }, intentos: {}, tokens: [], contador: { solicitud: 0, correo: 0, historico: registrosHistoricos.length } };
     this.notificar();
   }
 
@@ -66,4 +69,4 @@ export class Store {
   }
 }
 
-Object.assign(Store.prototype, acceso, usuarios, puntos, muestras, flujo, lab, revision, selectores, alertas);
+Object.assign(Store.prototype, acceso, usuarios, puntos, muestras, flujo, lab, revision, selectores, alertas, historico);

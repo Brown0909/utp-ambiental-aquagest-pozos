@@ -27,7 +27,7 @@ export default function muestraNueva(ctx) {
       <div class="rejilla rejilla-2">${entrada('fecha', 'Fecha', { tipo: 'date', valor: toDateStr(ahora), requerido: true, max: toDateStr(ahora) })}${entrada('hora', 'Hora', { tipo: 'time', valor: toTimeStr(ahora), requerido: true })}</div>
       ${selector('tecnicoId', 'Técnico responsable', tecnicos.map((u) => ({ valor: u.id, etiqueta: `${u.nombre} (${u.rol})` })), { valor: yo?.id ?? '', requerido: true, vacio: null })}
       ${pastillas('tipoAgua', 'Tipo de agua', TIPOS_AGUA, '', { requerido: true })}
-      ${pastillas('objetivo', 'Objetivo de la evaluación', OBJETIVOS, 'Solo monitoreo', { requerido: true })}
+      ${pastillas('objetivo', 'Objetivo de la evaluación', OBJETIVOS, '', { requerido: true, ayuda: 'Elija uno a propósito: «Solo monitoreo» no compara contra ningún límite.' })}
       <div class="campo"><span class="campo-titulo">Normativa aplicable</span><div id="normativa" class="aviso aviso-gris" aria-live="polite"></div></div>
       ${pastillas('clasificacion', 'Clasificación de la muestra', [{ valor: 'referencia', etiqueta: 'Muestra de referencia' }, { valor: 'seguimiento', etiqueta: 'Seguimiento después de lluvia' }], 'referencia', { requerido: true })}
       <div id="bloque-referencia" hidden>${selector('referenciaFolio', 'Muestra de referencia', [], { requerido: true, ayuda: 'Referencia registrada del mismo punto o pozo.' })}</div>
