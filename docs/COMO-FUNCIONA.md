@@ -83,3 +83,22 @@
 | *consulta preparada* | Rellenar un formulario con huecos, para que lo escrito nunca se confunda con una orden |
 | *CSRF / Origin* | Revisar de dónde viene el pedido, para que otra página no lo mande a tu nombre |
 | *await / async* | «Espera la respuesta de la oficina antes de seguir» |
+
+## 28-oct-2026 — Los límites de la norma ya salen del reglamento vigente
+
+> Antes era así: la app comparaba contra los límites del reglamento viejo (23-395-99): coliformes «≤ 3 o ≤ 10» y conductividad sin
+> límite. Ahora compara contra el vigente (21-2019).
+
+### 🧒 Cómo funciona por dentro
+
+1. **Qué problema resuelve.** Una regla desactualizada da un veredicto equivocado: una muestra con 2 coliformes salía «Cumple» cuando hoy
+   la norma exige ausencia.
+2. **La lógica: la regla de la cancha.** El sistema es el árbitro y la norma es el reglamento del partido. Si el árbitro lleva el
+   reglamento del año pasado, pita mal. Alguien tuvo que **ir a leer el reglamento oficial** (la Gaceta Oficial) y copiar los números
+   exactos: nitrato 10 mg/L «como Nitrógeno», pH 6,5–8,5, conductividad 850, coliformes y E. coli en cero.
+3. **Una sola tabla de límites** (en el código está en `normativa.js`): cambiar un número ahí cambia el veredicto en toda la app.
+4. **Qué pasa si falla y qué lo vigila.** 168 pruebas, y las de los límites se verificaron cambiando cada número a propósito para ver
+   que se pone en rojo (incluido el pH, que antes nadie vigilaba). La evidencia (fotos de las tablas oficiales) está en
+   `docs/assets/normativa/`.
+5. **Lo que sigue pendiente:** confirmar que ninguna resolución posterior modificó el reglamento, y cargar los reglamentos de descarga
+   y reutilización (hoy dicen «Límite no cargado», a propósito).

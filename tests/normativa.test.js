@@ -49,24 +49,30 @@ test('RF-55 solo monitoreo: todo «Sin criterio» y NUNCA cumple/no cumple', () 
 });
 
 test('RF-54 potable que cumple: cada parámetro con su límite', () => {
-  const r = evaluar(potable(), res({ nitrato: { valor: 4.8, forma: 'NO3-N' }, e_coli: { valor: 0 }, coliformes_totales: { valor: 2 }, conductividad: { valor: 420 } }));
+  const r = evaluar(potable(), res({ nitrato: { valor: 4.8, forma: 'NO3-N' }, e_coli: { valor: 0 }, coliformes_totales: { valor: 0 }, conductividad: { valor: 420 } }));   // RT 21-2019: coliformes < 1 UFC/100 mL
   const por = Object.fromEntries(r.filas.map((f) => [f.key, f]));
   assert.equal(por.nitrato.estado, 'cumple');
   assert.equal(por.e_coli.estado, 'cumple');
   assert.equal(por.coliformes_totales.estado, 'cumple');
-  assert.equal(por.conductividad.estado, 'sin_limite');      // RF-56
-  assert.equal(por.conductividad.limiteTexto, 'Límite no cargado');
+  assert.equal(por.conductividad.estado, 'cumple');          // RT 21-2019, Tabla 3: 850 µS/cm (antes «sin límite», RF-56)
+  assert.equal(por.conductividad.limiteTexto, '≤ 850 µS/cm');
   assert.equal(por.ph_campo.estado, 'cumple');
   assert.equal(r.dictamen.valor, 'Cumple');
-  assert.equal(r.dictamen.parcial, true, 'hay un parámetro sin límite');
+  assert.equal(r.dictamen.parcial, false, 'con el RT 21-2019 los cuatro parámetros de laboratorio tienen límite');
 });
 
 test('potable que NO cumple: E. coli, coliformes, nitrato y pH fuera', () => {
   const r = evaluar(potable({ campo: { ph: 5.2 } }), res({ nitrato: { valor: 12.4, forma: 'NO3-N' }, e_coli: { valor: 1 }, coliformes_totales: { valor: 4 } }));
   assert.ok(r.filas.every((f) => f.estado === 'no_cumple'));
   assert.equal(r.dictamen.valor, 'No cumple');
-  assert.equal(evaluar(potable({ tipoAgua: 'Subterránea/Pozo' }), res({ coliformes_totales: { valor: 10 } })).filas[0].estado, 'cumple', 'pozo: tope 10');
-  assert.equal(evaluar(potable(), res({ coliformes_totales: { valor: 4 } })).filas[0].estado, 'no_cumple', 'distribución: tope 3');
+  // RT 21-2019, Tabla 1: coliformes < 1 UFC/100 mL, igual para pozo y para red de distribución (ya no hay «tope 10» ni «tope 3»)
+  for (const tipoAgua of ['Subterránea/Pozo', 'Agua potable']) {
+    assert.equal(evaluar(potable({ tipoAgua }), res({ coliformes_totales: { valor: 1 } })).filas[0].estado, 'no_cumple', `${tipoAgua}: 1 UFC ya no cumple`);
+    assert.equal(evaluar(potable({ tipoAgua }), res({ coliformes_totales: { valor: 0 } })).filas[0].estado, 'cumple', `${tipoAgua}: 0 UFC cumple`);
+  }
+  // Tabla 3: conductividad ≤ 850 µS/cm, con el borde exacto
+  assert.equal(evaluar(potable(), res({ conductividad: { valor: 850 } })).filas[0].estado, 'cumple', '850 cumple');
+  assert.equal(evaluar(potable(), res({ conductividad: { valor: 851 } })).filas[0].estado, 'no_cumple', '851 no cumple');
 });
 
 test('🔴 RF-57 forma distinta SIN conversión documentada: no compara y bloquea', () => {
@@ -103,4 +109,12 @@ test('combinación no definida: sin criterio, sin dictamen de cumplimiento', () 
   const r = evaluar({ tipoAgua: 'Agua superficial', objetivo: 'Consumo humano', campo: {} }, res({ e_coli: { valor: 5 } }));
   assert.equal(r.filas[0].estado, 'sin_criterio');
   assert.equal(r.dictamen.valor, 'Sin criterio aplicable');
+});
+
+test('RT 21-2019, Tabla 2: el pH de campo se evalúa entre 6,5 y 8,5, con sus bordes exactos', () => {
+  const estadoPh = (ph) => evaluar(potable({ campo: { ph } }), res({ nitrato: { valor: 1, forma: 'NO3-N' } })).filas.find((f) => f.key === 'ph_campo').estado;
+  assert.equal(estadoPh(6.4), 'no_cumple', 'bajo el mínimo');
+  assert.equal(estadoPh(6.5), 'cumple', 'borde inferior');
+  assert.equal(estadoPh(8.5), 'cumple', 'borde superior');
+  assert.equal(estadoPh(8.6), 'no_cumple', 'sobre el máximo');
 });

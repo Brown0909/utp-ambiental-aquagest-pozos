@@ -66,7 +66,7 @@ npm start
 
 ## Contexto normativo (Panamá)
 
-- **Reglamento Técnico DGNTI-COPANIT 21-2019** — Valor Máximo Permitido de nitrato en agua potable.
+- **Reglamento Técnico DGNTI-COPANIT 21-2019** — Valor Máximo Permitido de nitrato en agua potable (**10 mg/L como Nitrógeno**, verificado el 28-oct-2026 contra el texto oficial; ver [`docs/VERIFICACION-NORMATIVA.md`](docs/VERIFICACION-NORMATIVA.md)).
   Aplica a cualquier sistema de abastecimiento, incluidos los pozos rurales.
 - **Decreto Ejecutivo N.º 1839 (2014)** — marco regulatorio de las Juntas Administradoras de
   Acueductos Rurales (JAAR).

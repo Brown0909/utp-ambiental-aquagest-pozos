@@ -206,3 +206,10 @@ Doble clic al guardar (no duplica el folio) · recarga a mitad de un formulario 
 ## Dudas abiertas
 
 Ninguna. (Las decisiones D1–D11 las tomó el asistente por delegación y están listadas arriba para que José las vete.)
+
+## Actualización normativa (28-oct-2026, decisión de José: «Sí, actualizar»)
+
+Los límites cargados **ya no** salen del RT 23-395-99: se verificaron contra el texto oficial del **RT DGNTI-COPANIT 21-2019**
+(ver `docs/VERIFICACION-NORMATIVA.md`). Cambios: coliformes totales y E. coli < 1 UFC/100 mL (ausencia), igual para pozo y red;
+conductividad 850 µS/cm; nitrato 10 mg/L **como N** (confirmado). Esto reemplaza lo dicho en la línea de «Los límites normativos
+cargados…» y en D5 («por confirmar»); lo anterior se conserva arriba como historial.

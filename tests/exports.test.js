@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { crear, avanzarA } from './helpers.js';
+import { crear, avanzarA, como } from './helpers.js';
 import { celdaSegura, filasMuestras, filasResultados, filasCustodia, textoFiltros, nombreArchivo } from '../docs/app/js/core/exports.js';
 
 test('RF-62 las filas exportadas son EXACTAMENTE las muestras del filtro vigente', () => {
@@ -30,7 +30,12 @@ test('🔴 RF-59 el Excel y el PDF tampoco muestran Cumple/No cumple antes de la
   assert.deepEqual(dict, ['Cumple', 'Cumple', 'No cumple', 'No cumple', 'Sin criterio aplicable', 'Sin criterio aplicable']);
   const eval008 = filasResultados(s, [s.muestraPorFolio('AG-2026-008')]);
   assert.equal(eval008.find((f) => f['Parámetro'] === 'Nitrato')['Evaluación'], 'No cumple');
-  assert.equal(eval008.find((f) => f['Parámetro'] === 'Conductividad')['Evaluación'], 'Límite no cargado');
+  assert.equal(eval008.find((f) => f['Parámetro'] === 'Conductividad')['Evaluación'], 'Cumple');   // RT 21-2019, Tabla 3 (850 µS/cm); antes «Límite no cargado»
+  // «Límite no cargado» sigue existiendo donde de verdad falta el reglamento: una descarga (COPANIT 35-2019 sin cargar)
+  const folioDescarga = avanzarA(s, 'Resultados', { puntoId: 'PT-003', tipoAgua: 'Agua residual tratada', objetivo: 'Descarga', solicitados: ['conductividad'] });
+  como(s, 'admin');
+  assert.equal(s.confirmarRevision(folioDescarga, { observaciones: 'Revisión de prueba: reglamento de descarga sin límites cargados.' }).ok, true);
+  assert.equal(filasResultados(s, [s.muestraPorFolio(folioDescarga)]).find((f) => f['Parámetro'] === 'Conductividad')['Evaluación'], 'Límite no cargado');
 });
 
 test('Sin dato: la lluvia ausente se exporta como «Sin dato» y el nitrato conserva su forma', () => {

@@ -1,6 +1,6 @@
 // Normativa aplicable y evaluación. Principio 9 de la constitución: NINGÚN límite se inventa.
-// Los límites cargados salen del texto oficial del RT DGNTI-COPANIT 23-395-99 (Tablas 2 y 3 y sección 3.1);
-// falta confirmarlos contra el RT 21-2019, que lo reemplazó. Todo lo demás dice «Límite no cargado».
+// Los límites cargados salen del texto oficial del RT DGNTI-COPANIT 21-2019 (Resolución N.º 35 del 6-may-2019, Gaceta Oficial
+// 28777-B), Tablas 1, 2 y 3, leído el 28-oct-2026 (ver docs/VERIFICACION-NORMATIVA.md). Todo lo demás dice «Límite no cargado».
 import { convertirNitrato, FACTOR_NO3_A_NO3N, numTexto, etiquetaFormaCorta } from './units.js';
 
 export const TIPOS_AGUA = ['Agua potable', 'Agua superficial', 'Subterránea/Pozo', 'Agua residual', 'Agua residual tratada'];
@@ -14,7 +14,7 @@ export const PARAMETROS_LAB = {
 export const ORDEN_PARAMETROS = ['conductividad', 'coliformes_totales', 'e_coli', 'nitrato'];
 
 export const REGLAMENTOS = {
-  potable: { id: 'COPANIT 21-2019', nombre: 'DGNTI-COPANIT 21-2019 · Agua potable', verificacion: 'Límites verificados en el texto del RT 23-395-99; falta confirmarlos contra el RT 21-2019.' },
+  potable: { id: 'COPANIT 21-2019', nombre: 'DGNTI-COPANIT 21-2019 · Agua potable', verificacion: 'Límites verificados en el texto oficial del RT 21-2019 (Tablas 1, 2 y 3).' },
   descarga: { id: 'COPANIT 35-2019', nombre: 'DGNTI-COPANIT 35-2019 · Descargas', verificacion: 'Límites no cargados: verificar en el reglamento.' },
   reutilizacion: { id: 'COPANIT 24-99', nombre: 'DGNTI-COPANIT 24-99 · Reutilización', verificacion: 'Límites no cargados: verificar en el reglamento.' },
 };
@@ -46,12 +46,12 @@ export function normativaAplicable(tipoAgua, objetivo) {
 export function limitesPara(tipoAgua, objetivo) {
   const n = normativaAplicable(tipoAgua, objetivo);
   if (n.reglamentoId !== 'potable') return {};
-  const distribuida = tipoAgua === 'Agua potable';
   return {
-    nitrato: { max: 10, unidad: 'mg/L', forma: 'NO3-N', nota: 'El reglamento no precisa la forma; se interpreta como NO3-N (por confirmar).' },
-    e_coli: { max: 0, unidad: 'UFC/100 mL', nota: 'El reglamento fija 0 para coliformes fecales; se compara E. coli como indicador (por confirmar).' },
-    coliformes_totales: { max: distribuida ? 3 : 10, unidad: 'UFC/100 mL', nota: distribuida ? 'Agua en el sistema de distribución.' : 'Agua no distribuida por tuberías.' },
-    ph_campo: { min: 6.5, max: 8.5, unidad: '', nota: 'Medición de campo.' },
+    nitrato: { max: 10, unidad: 'mg/L', forma: 'NO3-N', nota: 'Tabla 3: «Nitrato (N)», 10 mg/L, «como Nitrógeno».' },
+    e_coli: { max: 0, unidad: 'UFC/100 mL', nota: 'Tabla 1: < 1,1 NMP/100 mL (< 1 UFC/100 mL), es decir, ausencia.' },
+    coliformes_totales: { max: 0, unidad: 'UFC/100 mL', nota: 'Tabla 1: < 1,1 NMP/100 mL (< 1 UFC/100 mL), es decir, ausencia.' },
+    conductividad: { max: 850, unidad: 'µS/cm', nota: 'Tabla 3.' },
+    ph_campo: { min: 6.5, max: 8.5, unidad: '', nota: 'Tabla 2. Medición de campo.' },
   };
 }
 
