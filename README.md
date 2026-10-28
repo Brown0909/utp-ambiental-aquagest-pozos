@@ -29,8 +29,29 @@ Las 27 láminas del prototipo son **17 pantallas** (escritorio + celular) y toda
 registrar pozos y muestras, enviar y recibir en laboratorio, cargar resultados con certificado, evaluar contra la
 norma, confirmar la revisión técnica, ver el mapa, filtrar el historial y descargar PDF/Excel.
 Usuarios de demostración (clave `Aqua2026!`): `carlos.chen@` (Técnico), `ana.rodriguez@` (Laboratorio),
-`maria.castillo@` (Administrador), todos `@miambiente.gob.pa`. **No hay base de datos:** lo que se escribe vive
-en la pestaña y se reinicia al recargar. Pruebas: `npm test` (110 pruebas automáticas).
+`maria.castillo@` (Administrador), todos `@miambiente.gob.pa`. **En ese link no hay base de datos:** lo que se escribe vive
+en la pestaña y se reinicia al recargar (para guardar datos, vea «Servidor con base de datos» más abajo).
+Pruebas: `npm test` (pruebas automáticas del núcleo de reglas y del servidor).
+
+## Servidor con base de datos
+
+Además del link de demostración, el proyecto trae un **servidor** que guarda todo en una base de datos (SQLite) y deja
+que **varias personas compartan los mismos datos** (Spec 004, carpeta `spec/004-backend-base-de-datos/`).
+
+```
+npm start
+```
+
+- Necesita **Node 22.13 o más nuevo** (`node -v`). No hay que instalar nada más: no usa paquetes de npm.
+- Imprime la dirección para este computador (`http://localhost:3000/app/`) y la de **otros computadores de la misma red**.
+- La base queda en `data/aquagest.db` (no se sube a GitHub). Copiar ese archivo es hacer un respaldo.
+- Variables opcionales: `PUERTO` (por defecto 3000), `AQUAGEST_DB` (otra ruta de base) y `AQUAGEST_DEMO=0` (apaga la
+  bandeja de correo simulada pública; con `npm start` está encendida).
+- Cómo probarlo entre dos computadoras en 10 minutos: [`docs/GUIA-PRUEBA-EN-PAREJA.md`](./docs/GUIA-PRUEBA-EN-PAREJA.md).
+
+> ⚠️ **Solo para la red local, nunca para el internet abierto.** Esta versión no tiene límite de ritmo por IP, no usa
+> HTTPS, no tiene respaldo automático y no pasó por una revisión de seguridad independiente. Las claves de los usuarios
+> de ejemplo (`Aqua2026!`) son de demostración. Desde GitHub Pages la app sigue en modo demostración, sin guardar nada.
 
 ## Contenido de este repositorio
 
@@ -52,7 +73,7 @@ en la pestaña y se reinicia al recargar. Pruebas: `npm test` (110 pruebas autom
 
 ## Alcance y limitaciones
 
-Es una **demostración universitaria con datos ficticios**: no hay datos de campo reales ni backend; la
-aplicación (`docs/app/`) simula el flujo completo en el navegador. El dictamen Cumple/No cumple solo aparece
+Es una **demostración universitaria con datos ficticios**: no hay datos de campo reales; en GitHub Pages la
+aplicación (`docs/app/`) simula el flujo completo en el navegador, y con `npm start` lo guarda en un servidor local (ver arriba). El dictamen Cumple/No cumple solo aparece
 tras una revisión técnica humana confirmada, y los límites normativos sin verificar se muestran como
 «Límite no cargado». Metodología: SDD — ver `spec/` (constitución, spec 001 y spec 002).

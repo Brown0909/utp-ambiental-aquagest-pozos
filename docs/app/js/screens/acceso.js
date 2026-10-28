@@ -3,13 +3,15 @@ import { html } from '../ui/dom.js';
 import { errorForm, leer, mostrarErrores } from '../ui/forms.js';
 import { icono } from '../ui/icons.js';
 import { marcoPublico, entradaIcono, enlazarVer } from '../ui/publico.js';
-import { CLAVE_DEMO } from '../core/seed.js';
+import { CLAVE_DEMO, construirSeed } from '../core/seed.js';
 
 const ROLES_RAPIDOS = [['Técnico', 'Técnico'], ['Laboratorio', 'Laboratorio'], ['Administrador', 'Administrador']];
 
 export default function acceso(ctx) {
   const { store } = ctx;
-  const quien = (rol) => store.data.usuarios.find((u) => u.rol === rol && u.estado === 'Activo');
+  // En modo servidor, sin sesión el servidor no entrega la lista de usuarios: los atajos usan los usuarios de ejemplo (públicos en el código).
+  const ejemplo = construirSeed().usuarios;
+  const quien = (rol) => store.data.usuarios.find((u) => u.rol === rol && u.estado === 'Activo') ?? ejemplo.find((u) => u.rol === rol && u.estado === 'Activo');
   const contenido = marcoPublico(html`
     <h2>Acceso al Sistema</h2>
     <p class="suave">Inicie sesión para gestionar las muestras ambientales.</p>
@@ -37,10 +39,10 @@ export default function acceso(ctx) {
         form.password.value = CLAVE_DEMO;
         form.querySelector('button[type=submit]').focus();
       }));
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const v = leer(form);
-        const r = store.login(v.correo, v.password);
+        const r = await store.login(v.correo, v.password);
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         ctx.aviso(`Bienvenido/a, ${r.datos.usuario.nombre}.`);
         ctx.navegar('panel');

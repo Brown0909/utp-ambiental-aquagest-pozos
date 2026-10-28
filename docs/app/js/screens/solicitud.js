@@ -24,9 +24,9 @@ export default function solicitud(ctx) {
     contenido: marcoPublico(formulario),
     montar(raiz) {
       const form = raiz.querySelector('#form-solicitud');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const r = store.solicitarCuenta(leer(form));
+        const r = await store.solicitarCuenta(leer(form));
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         raiz.querySelector('.caja').innerHTML = '';
         const ok = document.createElement('div');

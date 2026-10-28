@@ -54,10 +54,10 @@ export default function laboratorio(ctx) {
       if (!form) return;
       const cert = enlazarArchivo(raiz, 'certificado');
       raiz.querySelector('[data-demo]').addEventListener('click', () => cert.poner(certificadoDemo(m, p.nombre)));
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (form.dataset.enviando) return;
-        const r = store.guardarResultados(m.folio, { ...leer(form), certificado: cert.obtener() });
+        const r = await store.guardarResultados(m.folio, { ...leer(form), certificado: cert.obtener() });
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         form.dataset.enviando = '1';
         ctx.aviso(`Resultados de ${m.folio} guardados. Pasan a revisión técnica.`);

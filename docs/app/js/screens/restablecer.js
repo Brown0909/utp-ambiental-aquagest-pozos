@@ -8,12 +8,13 @@ const MENSAJES = {
   invalido: 'El enlace no es válido.',
   usado: 'Este enlace ya fue usado. Cada enlace sirve una sola vez.',
   vencido: 'El enlace venció (dura 30 minutos).',
+  sinconexion: 'No hay conexión con el servidor.',
 };
 
-export default function restablecer(ctx) {
+export default async function restablecer(ctx) {
   const { store } = ctx;
   const token = ctx.params.token;
-  const estado = store.estadoToken(token);
+  const estado = await store.estadoToken(token);
   if (estado !== 'valido') {
     return { publico: true, contenido: marcoPublico(html`<h2>Restablecer contraseña</h2>
       <div class="aviso aviso-mal" style="margin:18px 0">${icono('alerta')}<div><strong>${MENSAJES[estado]}</strong>Solicite un enlace nuevo.</div></div>
@@ -31,10 +32,10 @@ export default function restablecer(ctx) {
       </form>`),
     montar(raiz) {
       const form = raiz.querySelector('#form-restablecer');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const v = leer(form);
-        const r = store.restablecer(token, v.nueva, v.confirmacion);
+        const r = await store.restablecer(token, v.nueva, v.confirmacion);
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         ctx.aviso('Contraseña actualizada. Ya puede iniciar sesión.');
         ctx.navegar('acceso');

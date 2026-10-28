@@ -24,8 +24,8 @@ export function enlazarSolicitudes(raiz, ctx) {
   raiz.querySelectorAll('[data-solicitud]').forEach((art) => {
     const id = art.dataset.solicitud;
     const salida = art.querySelector('.error');
-    const resolver = (datos, ok) => {
-      const r = store.resolverSolicitud(id, datos);
+    const resolver = async (datos, ok) => {
+      const r = await store.resolverSolicitud(id, datos);
       if (!r.ok) { salida.textContent = Object.values(r.errores).join(' '); return; }
       ctx.aviso(ok);
       ctx.rerender();

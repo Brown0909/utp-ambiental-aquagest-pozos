@@ -25,10 +25,10 @@ export default function recuperar(ctx) {
     montar(raiz) {
       const form = raiz.querySelector('#form-recuperar');
       const salida = raiz.querySelector('#resultado');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         salida.textContent = '';
-        const r = store.solicitarRecuperacion(leer(form).correo);
+        const r = await store.solicitarRecuperacion(leer(form).correo);
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         mostrarErrores(form, {});
         const caja = document.createElement('div');

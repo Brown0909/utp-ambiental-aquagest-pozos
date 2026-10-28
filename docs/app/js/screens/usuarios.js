@@ -66,15 +66,15 @@ export default function usuarios(ctx) {
       const pintarCorreos = () => montar(raiz.querySelector('#correos'), bandeja());
       const pintarLista = () => {
         montar(zonaLista, lista());
-        zonaLista.querySelectorAll('.cambiar-rol').forEach((s) => s.addEventListener('change', () => {
-          const r = store.cambiarRol(s.dataset.id, s.value);
+        zonaLista.querySelectorAll('.cambiar-rol').forEach((s) => s.addEventListener('change', async () => {
+          const r = await store.cambiarRol(s.dataset.id, s.value);
           errLista.textContent = r.ok ? '' : Object.values(r.errores).join(' ');
           if (r.ok) ctx.aviso('Rol actualizado.');
           pintarLista();
         }));
-        zonaLista.querySelectorAll('[data-estado]').forEach((b) => b.addEventListener('click', () => {
+        zonaLista.querySelectorAll('[data-estado]').forEach((b) => b.addEventListener('click', async () => {
           const u = store.usuarioPorId(b.dataset.estado);
-          const r = store.cambiarEstado(u.id, u.estado === 'Activo' ? 'Inactivo' : 'Activo');
+          const r = await store.cambiarEstado(u.id, u.estado === 'Activo' ? 'Inactivo' : 'Activo');
           errLista.textContent = r.ok ? '' : Object.values(r.errores).join(' ');
           if (r.ok) { ctx.aviso(`Usuario ${r.datos.estado === 'Activo' ? 'activado' : 'desactivado'}.`); pintarLista(); }
         }));
@@ -83,9 +83,9 @@ export default function usuarios(ctx) {
       filtros.addEventListener('submit', (e) => e.preventDefault());
       filtros.addEventListener('input', () => { Object.assign(filtro, { texto: filtros.texto.value, rol: filtros.rol.value, estado: filtros.estado.value }); pintarLista(); });
       const form = raiz.querySelector('#invitar');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const r = store.invitarUsuario(leer(form));
+        const r = await store.invitarUsuario(leer(form));
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         mostrarErrores(form, {});
         form.reset();

@@ -1,6 +1,7 @@
-// Arranque: crea el store (datos de ejemplo en memoria), decide qué pantalla mostrar según la sesión y el rol
-// (RF-9, RF-10, RF-15) y la dibuja. Nada se guarda: al recargar, todo vuelve a empezar (RF-72).
-import { Store } from './core/store.js';
+// Arranque: crea el almacén, decide qué pantalla mostrar según la sesión y el rol (RF-9, RF-10, RF-15) y la dibuja.
+// Servido por `npm start` (Spec 004): los datos viven en el servidor y la sesión se recupera ANTES del primer dibujo.
+// Desde GitHub Pages (sin /api): demostración en memoria, al recargar todo vuelve a empezar (RF-72).
+import { crearAlmacen } from './ui/api.js';
 import { esPublica, puedeVerRuta } from './core/permissions.js';
 import { html, montar } from './ui/dom.js';
 import { analizarHash, resolver } from './ui/router.js';
@@ -8,10 +9,22 @@ import { shell } from './ui/layout.js';
 import { aviso } from './ui/avisos.js';
 import { icono } from './ui/icons.js';
 
-const store = new Store();
 const raiz = document.getElementById('app');
 let limpiarPantalla = null;
 let contador = 0;
+let escribiendo = false;   // la persona tocó un formulario desde el último dibujo
+
+// RF-92: si otra persona cambió algo, se redibuja la pantalla, salvo que esta persona esté escribiendo (no se pierde nada).
+function alActualizar({ sesionPerdida = false } = {}) {
+  if (sesionPerdida) { aviso('Su sesión terminó. Entre de nuevo.', 'mal'); pintar(); return; }
+  const a = document.activeElement;
+  const enCampo = a && raiz.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+  if (!escribiendo && !enCampo) pintar({ conservar: true });
+}
+raiz.addEventListener('input', () => { escribiendo = true; });
+raiz.addEventListener('change', () => { escribiendo = true; });
+
+const store = await crearAlmacen({ avisar: aviso, alActualizar });
 
 export function navegar(ruta) {
   const destino = `#/${ruta}`;
@@ -25,7 +38,13 @@ function enlazarMarco() {
   raiz.querySelector('[data-abrir-menu]')?.addEventListener('click', () => document.body.classList.add('menu-abierto'));
   raiz.querySelector('[data-cerrar-menu]')?.addEventListener('click', cerrar);
   raiz.querySelectorAll('.menu a').forEach((a) => a.addEventListener('click', cerrar));
-  raiz.querySelector('[data-salir]')?.addEventListener('click', () => { cerrar(); store.logout(); aviso('Sesión cerrada.'); navegar('acceso'); });
+  raiz.querySelector('[data-salir]')?.addEventListener('click', async () => {
+    cerrar();
+    const r = await store.logout();
+    if (r && !r.ok) { aviso(Object.values(r.errores).join(' '), 'mal'); return; }   // sin conexión: la sesión sigue abierta
+    aviso('Sesión cerrada.');
+    navegar('acceso');
+  });
 }
 
 function mostrarMarco(titulo, contenido, subtitulo = '') {
@@ -36,8 +55,10 @@ function mostrarMarco(titulo, contenido, subtitulo = '') {
 const sinPermiso = html`<div class="aviso aviso-mal">${icono('candado')}<div><strong>No tiene permiso para abrir esta pantalla.</strong>Su rol no incluye esta acción. Use el menú para ir a una pantalla disponible.</div></div>`;
 const noEncontrada = html`<div class="aviso aviso-amarillo">${icono('alerta')}<div><strong>La pantalla no existe.</strong>Revise la dirección o use el menú.</div></div>`;
 
-async function pintar() {
+async function pintar({ conservar = false } = {}) {
   const mio = ++contador;
+  const desplazamiento = window.scrollY;
+  escribiendo = false;
   limpiarPantalla?.();
   limpiarPantalla = null;
   document.body.classList.remove('menu-abierto');
@@ -55,12 +76,13 @@ async function pintar() {
   try {
     const modulo = await destino.cargar();
     if (mio !== contador) return;                                      // llegó otra navegación mientras cargaba
-    const p = modulo.default(ctx);
+    const p = await modulo.default(ctx);                               // algunas pantallas esperan al servidor antes de dibujarse
+    if (mio !== contador) return;
     if (publica) { montar(raiz, p.contenido); p.montar?.(raiz); }
     else { mostrarMarco(p.titulo, p.contenido, p.subtitulo); p.montar?.(raiz.querySelector('#principal')); }
     limpiarPantalla = p.limpiar ?? null;
-    window.scrollTo(0, 0);
-    (raiz.querySelector('#principal') ?? raiz).focus({ preventScroll: true });
+    if (conservar) window.scrollTo(0, desplazamiento);               // redibujo por cambios de otra persona: no mover la pantalla
+    else { window.scrollTo(0, 0); (raiz.querySelector('#principal') ?? raiz).focus({ preventScroll: true }); }
   } catch (err) {
     console.error(err);
     const caja = html`<div class="aviso aviso-mal">${icono('alerta')}<div><strong>Ocurrió un error al mostrar la pantalla.</strong>Recargue la página. (Detalle técnico en la consola del navegador.)</div></div>`;

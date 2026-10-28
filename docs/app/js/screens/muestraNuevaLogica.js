@@ -68,10 +68,10 @@ export function enlazarFormularioMuestra(raiz, ctx) {
     alError: (msg) => mostrarErrores(form, { lat: msg }),
   }));
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (form.dataset.enviando) return;
-    const r = store.crearMuestra({ ...leer(form), foto: foto.obtener() });
+    const r = await store.crearMuestra({ ...leer(form), foto: foto.obtener() });
     if (!r.ok) { mostrarErrores(form, r.errores); return; }
     form.dataset.enviando = '1';
     (r.advertencias ?? []).forEach((a) => ctx.aviso(a, 'mal'));

@@ -41,10 +41,10 @@ export function enlazarRevision(raiz, ctx, folio) {
   const conectar = (id, accion, mensaje) => {
     const form = raiz.querySelector(id);
     if (!form) return;
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (form.dataset.enviando) return;
-      const r = accion(leer(form));
+      const r = await accion(leer(form));
       if (!r.ok) { mostrarErrores(form, r.errores); return; }
       form.dataset.enviando = '1';
       ctx.aviso(mensaje);

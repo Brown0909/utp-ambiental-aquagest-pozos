@@ -79,11 +79,11 @@ export default function puntoForm(ctx) {
         }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
       });
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (form.dataset.enviando) return;
         const datos = leer(form);
-        const r = edicion ? store.editarPunto(id, datos) : store.crearPunto(datos);
+        const r = await (edicion ? store.editarPunto(id, datos) : store.crearPunto(datos));
         if (!r.ok) { mostrarErrores(form, r.errores); return; }
         form.dataset.enviando = '1';
         ctx.aviso(`${r.datos.id} guardado.`);

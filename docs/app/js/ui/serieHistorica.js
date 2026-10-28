@@ -102,7 +102,7 @@ export function montarImportacion(raiz, ctx, puntoId) {
     if (!/\.csv$/i.test(archivo.name)) return mostrar('Elija un archivo con extensión .csv.');
     if (!archivo.size) return mostrar('El archivo está vacío.');
     if (archivo.size > MAX_BYTES_CSV) return mostrar('El archivo supera 1 MB.');
-    const r = ctx.store.importarHistorico(puntoId, await archivo.text());
+    const r = await ctx.store.importarHistorico(puntoId, await archivo.text());
     if (!r.ok) return mostrar(r.errores._form ?? 'No se pudo importar el archivo.', r.detalle ?? []);
     ctx.aviso(`${r.datos.importadas} mes(es) importado(s).`);
     ctx.rerender();

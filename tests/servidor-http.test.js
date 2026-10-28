@@ -103,6 +103,15 @@ test('RF-97 solo se acepta JSON: otro tipo de contenido o un cuerpo roto da 400'
     assert.equal((await c.post('/api/login', '{no es json')).status, 400);
     assert.equal((await c.post('/api/login', '[1,2]')).status, 400);
     assert.equal((await c.post('/api/login', 'null')).status, 400);
+    // 🔴 el truco de un formulario de otro sitio: un JSON VÁLIDO pero declarado como texto plano o como formulario
+    const valido = JSON.stringify({ correo: CORREOS.tecnico, password: 'Aqua2026!' });
+    for (const tipo of ['text/plain', 'application/x-www-form-urlencoded', 'multipart/form-data']) {
+      assert.equal((await c.post('/api/login', valido, { 'Content-Type': tipo })).status, 400, tipo);
+    }
+    assert.equal((await c.post('/api/login', valido, { 'Content-Type': 'text/plain' })).status, 400);
+    assert.equal(c.galleta.size, 0, 'no se creó sesión');
+    assert.equal(s.base.db.prepare('SELECT COUNT(*) AS n FROM sesiones').get().n, 0);
+    assert.equal((await c.post('/api/login', valido, { 'Content-Type': 'application/json; charset=utf-8' })).status, 200, 'JSON con charset sí');
   } finally { await s.cerrar(); }
 });
 

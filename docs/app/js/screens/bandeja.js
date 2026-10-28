@@ -5,8 +5,9 @@ import { icono } from '../ui/icons.js';
 import { marcoPublico } from '../ui/publico.js';
 import { fmtDateTime } from '../core/dates.js';
 
-export default function bandeja(ctx) {
-  const correos = ctx.store.data.correos;
+export default async function bandeja(ctx) {
+  // En modo servidor la bandeja es del servidor (solo con la demostración activa); en Pages, la de la memoria.
+  const correos = ctx.store.cargarBandeja ? await ctx.store.cargarBandeja() : ctx.store.data.correos;
   return {
     publico: true,
     contenido: marcoPublico(html`
