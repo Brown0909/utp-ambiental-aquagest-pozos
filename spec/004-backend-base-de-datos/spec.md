@@ -1,6 +1,6 @@
 # Spec 004 — Servidor y base de datos para AquaGest MiAMBIENTE
 
-> **Estado:** PROPUESTA — borrador del 28-oct-2026, a espera del «dale» de José · **Modo SDD:** actualización.
+> **Estado:** APROBADA en versión barata (28-oct-2026, «dale» de José: proyecto universitario, solo lo necesario) · **Modo SDD:** actualización.
 > **Origen:** pedido de José del 28-oct-2026 (chat del grupo: para el 75 % del jueves falta «el backend y la base de
 > datos que guarde registros»). Se construye **sobre la rama `VersionTripleA` de Alex** (Spec 003), sin modificarla.
 > Solo el QUÉ y el POR QUÉ. Radio de impacto en `impacto.md`; el cómo en `plan.md`.
@@ -27,9 +27,9 @@ así que no hay dos versiones de las reglas que puedan separarse.
 - **RF-94:** EL SISTEMA **no borra nada** de la base (principio 4): solo agrega o cambia el estado de un registro.
 - **RF-95:** SI el servidor no responde, ENTONCES EL SISTEMA lo avisa con un mensaje claro y **conserva lo escrito en el formulario**.
 - **RF-96:** EL SISTEMA guarda el histórico mensual y la importación CSV de la Spec 003 en la base, con el mismo límite (1 MB y 1000 filas) comprobado también en el servidor.
-- **RF-97:** 🔴 EL SISTEMA limita el cuerpo de cada petición a 1,5 MB, acepta solo JSON, rechaza peticiones de otro origen, y limita el ritmo por IP (100 por minuto; 10 intentos de entrada por minuto).
-- **RF-98:** EL SISTEMA copia la base con `npm run respaldo` (archivo con fecha en `data/respaldos/`, nunca dentro de `docs/`).
-- **RF-99:** EL SISTEMA trae pruebas automáticas del servidor (`npm test`) y una **guía de prueba en pareja** para que dos personas lo verifiquen desde dos computadoras.
+- **RF-97:** 🔴 EL SISTEMA limita el cuerpo de cada petición a 1,5 MB, acepta solo JSON y rechaza peticiones de otro origen. *(Versión barata: sin límite de ritmo por IP; el bloqueo de 5 intentos por cuenta del núcleo se mantiene.)*
+- **RF-98:** *(RETIRADO en la versión barata, 28-oct-2026: la base es un archivo `data/aquagest.db` que se copia a mano.)*
+- **RF-99:** EL SISTEMA trae pruebas automáticas del servidor (`npm test`) y una **guía de prueba en pareja (10 minutos)** para que dos personas lo verifiquen a mano desde dos computadoras.
 
 ## Qué partes del sistema toca (resumen; detalle en `impacto.md`)
 
@@ -55,6 +55,7 @@ así que no hay dos versiones de las reglas que puedan separarse.
 
 ## Fuera de alcance
 
+- **Versión barata (decisión de José, 28-oct):** sin revisión de seguridad independiente, sin recorrido automático en el navegador, sin respaldo automático, sin límite de ritmo por IP. **Por eso el servidor es solo para la red local del grupo, nunca para internet abierto.**
 - Servidor en la nube / link público con datos guardados (decisión de José: «en un PC con `npm start`»).
 - Correo real, pronóstico del tiempo y conexión automática a APIs de lluvia (siguen como en la Spec 003).
 - Segundo factor, recuperación por correo real, alertas de actividad sospechosa (regla 17 de José: solo se **guarda** el registro de accesos en esta spec).

@@ -1,6 +1,6 @@
 # Plan — Spec 004 (servidor y base de datos)
 
-> El CÓMO. Parte de `spec.md` y cita las filas M-n de `impacto.md`. Borrador del 28-oct-2026, a espera del «dale».
+> El CÓMO. Parte de `spec.md` y cita las filas M-n de `impacto.md`. **Versión barata aprobada el 28-oct-2026** (1 constructor en cadena; sin refutador ni recorrido; sin respaldo ni límite de ritmo).
 
 ## Idea central (en una frase)
 
@@ -61,7 +61,6 @@ server/                  (raíz del repo, FUERA de docs/ — M-28)
   db.js                  esquema + migración inicial + guardar/cargar + disparadores de accesos
   auth.js                scrypt, sesiones, registro de accesos
   almacen.js             arma el Store del núcleo para cada petición (M-18) y la lista blanca
-  respaldo.js            npm run respaldo (RF-98)
 data/                    (en .gitignore) aquagest.db, respaldos/
 docs/app/js/ui/api.js    AlmacenRemoto + detección de modo + sincronía cada 5 s
 tests/servidor-*.test.js pruebas del servidor (base en memoria)
@@ -83,9 +82,9 @@ docs/GUIA-PRUEBA-EN-PAREJA.md   cómo probar entre dos computadoras (RF-99)
 1. **Qué:** servidor + base de datos + navegador conectado, incluyendo el histórico de Alex.
 2. **Código:** `server/` nuevo, `ui/api.js` nuevo, 17 líneas `await` + `main.js` + `restablecer.js` + `bandeja.js`; 🔴 acceso, claves, sesiones, permisos, SQL.
 3. **Modelo:** Sonnet construye; la sesión escribe contrato, verifica con scripts y recorre el navegador.
-4. **Agentes:** 2 constructores Sonnet (A servidor, B navegador) + 1 refutador de seguridad Sonnet (+ arreglos).
-5. **Cómo:** A y B en paralelo en copias aisladas (el contrato de arriba los une); luego refutador; luego recorrido.
-6. **Costo:** ~1,8–2,4 M de tokens (sube ~0,2 M por incluir el histórico de Alex) y 3–4 h.
+4. **Agentes:** 1 constructor Sonnet (versión barata; antes 2 + refutador).
+5. **Cómo:** en cadena: primero servidor con pruebas, luego navegador (comparte lo ya leído).
+6. **Costo:** ~0,7–1,0 M de tokens y ~2 h (antes 1,8–2,4 M y 3–4 h).
 ✅ **PASA:** `npm test` ≥ 119 verde sin tocar pruebas viejas · pruebas del servidor verdes · un registro sigue ahí tras reiniciar · un Técnico no confirma una revisión ni por la API · `accesos` rechaza `UPDATE`/`DELETE` · `data/` y `server/` no salen en Pages · recorrido en navegador sin errores de consola ni de CSP.
 ⛔ **No se toca:** `main`, la rama `VersionTripleA`, `gerencia317`, los servicios de BEC, el link público de Pages.
 

@@ -8,7 +8,7 @@
 - [ ] **T1** (RF-84, 85, 94, 96; M-23, 24, 28, 33) `server/db.js`: esquema, siembra única, guardar solo lo que cambió, cargar al arrancar, `data/` en `.gitignore`. **PASA:** una prueba crea un punto, cierra y reabre la base y lo encuentra; ninguna ruta del código contiene `DELETE FROM`.
 - [ ] **T2** (RF-87, 88, 90, 91; M-1, 2, 5, 23, 32) `server/auth.js`: scrypt con sal, sesiones con cookie `HttpOnly`/`SameSite=Strict` y 8 h, tabla `accesos` con disparadores. **PASA:** `UPDATE accesos` y `DELETE FROM accesos` fallan; la clave guardada no es `Aqua2026!`; el registro no contiene contraseñas ni el correo tecleado en un fallo.
 - [ ] **T3** (RF-86, 89, 93, 97; M-3…M-18, 22, 31) `server/almacen.js` + `server/http.js` + `server/index.js`: rutas del contrato, lista blanca de acciones, usuario de la petición, permiso del rol, límites de cuerpo/ritmo/origen, servir `docs/`. **PASA:** un Técnico que manda `confirmarRevision` recibe `{ok:false, sinPermiso:true}`; una acción fuera de la lista blanca da 400; un cuerpo de 2 MB da 413; un `Origin` ajeno da 403.
-- [ ] **T4** (RF-98, 99) `server/respaldo.js` + scripts de `package.json` (`start`, `respaldo`; `engines` ≥ 22.13) + pruebas `tests/servidor-*.test.js`. **PASA:** `npm test` verde con el total ≥ 119 más las nuevas; cada prueba nueva «muerde» (se rompe el código a propósito y se pone roja).
+- [ ] **T4** (RF-99) scripts de `package.json` (`start`; `engines` ≥ 22.13) + pruebas `tests/servidor-*.test.js`. **PASA:** `npm test` verde con el total ≥ 119 más las nuevas; cada prueba nueva «muerde» (se rompe el código a propósito y se pone roja).
 
 ## Construcción — Agente B (navegador)
 
@@ -17,7 +17,7 @@
 
 ## Verificación — la sesión
 
-- [ ] **T7** (todos) Recorrido real en el navegador contra el servidor: crear pozo → muestra → envío → recepción → resultados → revisión; apagar y encender el servidor; los datos siguen. Dos pestañas con distinto usuario se ven entre sí en ≤ 5 s. Sin errores de consola ni violaciones de CSP.
-- [ ] **T8** (RF-87…91, 97; M-31) Refutador de seguridad (Sonnet, 2 lentes: «romperlo» y «dónde más está el mismo hueco»): SQL, sesión, CSRF, fuerza bruta, fuga de claves, ruta a `data/`. **PASA:** sin hallazgos ALTA abiertos.
+- [ ] **T7** (todos) *(Versión barata)* Prueba por script contra el servidor real (arranca, hace el flujo crear pozo → muestra → envío → recepción → resultados → revisión por HTTP, se apaga, se enciende y comprueba que los datos siguen). El recorrido en el navegador lo hace el grupo con la guía de prueba en pareja.
+- [~] **T8** *(RETIRADA en la versión barata por decisión de José: sin refutador de seguridad independiente.)*
 - [ ] **T9** (RF-99, regla 14) `docs/GUIA-PRUEBA-EN-PAREJA.md`, README y `docs/COMO-FUNCIONA.md` (con «🧒 Cómo funciona por dentro»).
 - [ ] **T10** (M-26, M-27) Revisión de pruebas: casos antes y después; informe a José de cualquier prueba vieja tocada (debe ser ninguna). Mostrar a Alex el diff contra su rama.
