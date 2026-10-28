@@ -49,8 +49,8 @@ así que no hay dos versiones de las reglas que puedan separarse.
 - **D3 —** El navegador conserva una copia de lectura de los datos (las pantallas de lectura no cambian); lo que cambia son las 17 escrituras, que esperan al servidor.
 - **D4 —** Una sola base compartida. Para probar entre ustedes: un computador corre `npm start` y los demás entran por `http://<IP del computador>:3000` desde la misma red.
 - **D5 —** GitHub Pages **sigue en modo demostración**: no puede alojar un servidor.
-- **D6 —** Las contraseñas de los usuarios de ejemplo siguen siendo `Aqua2026!` (ahora cifradas en la base); son de demostración.
-- **D7 —** La «bandeja de correo simulada» sigue pública solo mientras `AQUAGEST_DEMO=1` (activo en `npm start`): muestra los enlaces de recuperación, algo que un sistema real **no** debe hacer.
+- **D6 —** Las contraseñas de los usuarios de ejemplo siguen siendo `Aqua2026!` (ahora cifradas en la base); son de demostración. **No usar este servidor con datos reales** sin cambiarlas.
+- **D7 —** La «bandeja de correo simulada» existe solo mientras `AQUAGEST_DEMO=1` (activo en `npm start`) y muestra enlaces de recuperación, algo que un sistema real **no** debe hacer. **Cambio del 28-oct** (revisión de seguridad automática): ya no es pública; la ve quien abre la app **desde el mismo computador del servidor** o un **Administrador con sesión**. Desde otra PC de la red, sin ser Administrador, da 403.
 - **D8 —** Las marcas de tiempo las pone **el reloj del servidor**; el navegador usa el desfase con ese reloj para sus fechas por defecto.
 
 ## Fuera de alcance

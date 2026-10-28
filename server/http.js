@@ -7,6 +7,7 @@ import { stat } from 'node:fs/promises';
 import { resolve, sep, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Almacen, ACCIONES, argumentosValidos } from './almacen.js';
+import { can } from '../docs/app/js/core/permissions.js';
 import { NOMBRE_COOKIE, VIGENCIA_SESION_MS, datosCliente } from './auth.js';
 
 export const MAX_CUERPO = 1.5 * 1024 * 1024;
@@ -73,6 +74,16 @@ function leerCuerpo(req) {
   });
 }
 
+const DIRECCIONES_LOCALES = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
+/** La petición viene del mismo computador que corre el servidor (no de otra PC de la red). */
+export const esPeticionLocal = (req) => DIRECCIONES_LOCALES.has(req.socket?.remoteAddress);
+
+/** Los enlaces de recuperación sirven para tomar una cuenta: solo los ve quien está en el servidor o un Administrador con sesión. */
+export function puedeVerBandeja(req, almacen, idSesion) {
+  if (esPeticionLocal(req)) return true;
+  return Boolean(idSesion) && can(almacen.store.usuarioPorId(idSesion), 'gestionar_usuarios');
+}
+
 async function api(req, res, ruta, almacen, demo) {
   const metodo = req.method;
   const cliente = datosCliente(req);
@@ -86,6 +97,7 @@ async function api(req, res, ruta, almacen, demo) {
   if (ruta === '/api/estado') { if (soloGet()) enviarJson(res, 200, almacen.estado(almacen.sesionDe(cookie, cliente))); return; }
   if (ruta === '/api/bandeja') {
     if (!demo) return errorTransporte(res, 404, 'No encontrado.');
+    if (!puedeVerBandeja(req, almacen, almacen.sesionDe(cookie, cliente))) return errorTransporte(res, 403, 'La bandeja solo se ve desde el computador del servidor o con sesión de Administrador.');
     if (soloGet()) enviarJson(res, 200, almacen.bandeja());
     return;
   }

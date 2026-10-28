@@ -52,8 +52,9 @@ const publico = (u) => ({ id: u.id, nombre: u.nombre, correo: u.correo, rol: u.r
 const MAX_INTENTOS_EN_MEMORIA = 5000;
 
 export class Almacen {
-  constructor({ base, demo = false, reloj = () => Date.now() }) {
+  constructor({ base, demo = false, reloj = () => Date.now(), maxIntentosEnMemoria = MAX_INTENTOS_EN_MEMORIA }) {
     this.base = base;
+    this.maxIntentosEnMemoria = maxIntentosEnMemoria;
     this.demo = demo;
     this.reloj = reloj;
     this.store = new Store({ ahora: () => new Date(this.reloj()) });
@@ -126,7 +127,7 @@ export class Almacen {
     store.data.sesion.userId = null;
     const ahora = this.reloj();
     const nota = (evento) => anotar(this.base, { evento, cuentaId: u?.id ?? null, cliente, fechaMs: ahora });
-    this.#podarIntentos();
+    this.#podarIntentos(ahora);
     if (!r.ok) {
       if (r.inactivo) nota('cuenta_inactiva');
       else if (!r.bloqueado && !r.errores.correo && !r.errores.password) {
@@ -141,12 +142,20 @@ export class Almacen {
     return { resultado: { ok: true, datos: { usuario: publico(u) } }, sesionValor: valor, userId: u.id };
   }
 
-  /** Los intentos fallidos viven en memoria; si alguien inventa miles de correos, se descartan los más viejos. */
-  #podarIntentos() {
+  /**
+   * Los intentos fallidos viven en memoria; si alguien inventa miles de correos, se descartan los más viejos.
+   * Nunca se descarta un bloqueo vigente ni el conteo de una cuenta que existe: llenar la memoria no debe servir
+   * para desbloquear a nadie.
+   */
+  #podarIntentos(ahora) {
     const intentos = this.store.data.intentos;
     const claves = Object.keys(intentos);
-    if (claves.length <= MAX_INTENTOS_EN_MEMORIA) return;
-    for (const k of claves.slice(0, claves.length >> 1)) delete intentos[k];
+    if (claves.length <= this.maxIntentosEnMemoria) return;
+    const cuentas = new Set(this.store.data.usuarios.map((x) => normEmail(x.correo)));
+    for (const k of claves.slice(0, claves.length >> 1)) {
+      if (cuentas.has(k) || (intentos[k]?.hasta ?? 0) > ahora) continue;
+      delete intentos[k];
+    }
   }
 
   logout(cookie, cliente) {

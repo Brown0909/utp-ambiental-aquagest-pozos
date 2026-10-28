@@ -86,5 +86,5 @@ Para una prueba extra: busquen el archivo `data/aquagest.db` en la carpeta del p
 ## Lo que esta guía NO prueba
 
 - Los **archivos** (la foto de la muestra y el certificado PDF) **no se guardan** en el servidor en esta versión: se guarda su nombre y tamaño, pero no el contenido.
-- No hay correo real: los «correos» se ven en la **bandeja simulada** (`…/app/#/bandeja`), solo mientras el servidor corre en modo demostración.
+- No hay correo real: los «correos» se ven en la **bandeja simulada** (`…/app/#/bandeja`), solo mientras el servidor corre en modo demostración, y **solo desde el computador que corre el servidor** (o con una sesión de Administrador). Desde la otra PC, sin ser Administrador, la bandeja sale vacía a propósito: así nadie en la red puede robar un enlace de recuperación.
 - Desde **GitHub Pages** la aplicación sigue funcionando como demostración **sin guardar** nada (no hay servidor allí).

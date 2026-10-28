@@ -41,3 +41,45 @@
 | *hash routing* | Direcciones con `#` para moverse entre pantallas sin recargar |
 | *CSP* | Lista de invitados: el navegador solo carga lo que la página autorizó |
 | *SDD* | Escribir primero qué debe hacer el sistema (spec) y después construirlo |
+
+## 28-oct-2026 — El servidor y la base de datos (Spec 004)
+
+> Antes era así: todo vivía en la libreta de la pestaña (*store*) y se perdía al recargar. Ahora, si la app se abre desde el
+> servidor, la libreta vive en el servidor y se guarda en un archivo. En GitHub Pages sigue siendo como antes.
+
+### 🧒 Cómo funciona por dentro
+
+1. **Qué problema resuelve.** Lo que registraba una persona se perdía al recargar y nadie más lo veía. Ahora queda guardado y lo ven
+   todas las computadoras que entren al mismo servidor.
+2. **La lógica: una oficina con un solo archivador.** Antes cada visitante traía su propia libreta. Ahora hay una oficina (el
+   *servidor*) con **un archivador compartido** (la *base de datos*, en un archivo `data/aquagest.db`, de tipo SQLite). Quien entra
+   le pide a la oficina que anote o busque algo; la oficina decide y archiva.
+3. **Las mismas reglas, un solo reglamento.** La oficina usa **exactamente el mismo reglamento** (validaciones, permisos, normativa)
+   que ya tenía el navegador. No hay dos versiones que puedan contradecirse. Por eso el navegador casi no cambió: solo espera la
+   respuesta de la oficina antes de seguir (en el código se ve como `await`).
+4. **El portero ahora es de verdad.** Al entrar, la oficina te da un **gafete** (una *cookie de sesión*) que el navegador no puede
+   leer ni copiar (*HttpOnly*). Las contraseñas no se guardan: se guarda su **huella** mezclada con sal (*hash scrypt*), como una
+   cerradura que se puede comprobar pero no abrir al revés. Y los permisos se vuelven a revisar en la oficina (*doble candado*),
+   aunque la pantalla ya haya escondido el botón.
+5. **El libro de visitas que nadie puede tachar.** Cada entrada, salida y contraseña equivocada se anota en un libro (tabla
+   `accesos`) con un candado: ni con SQL se puede editar ni borrar (*disparadores* o *triggers*). Nada se guarda de las contraseñas.
+6. **Nada se borra.** El archivador solo agrega o cambia el estado; no tiene ninguna orden de borrar.
+7. **Qué pasaría si falla y qué lo vigila.** Si el servidor se cae, la pantalla avisa y no pierde lo escrito en el formulario. 167
+   pruebas automáticas ensayan el servidor y cada una se verificó rompiendo el código a propósito para ver que se pone en rojo.
+8. **Lo que NO tiene (honesto).** No tuvo revisión de seguridad independiente (decisión de José: proyecto universitario), no se
+   protege con HTTPS y las claves de ejemplo son conocidas (`Aqua2026!`). **Por eso es solo para la red del grupo, nunca para
+   internet abierto.** Además, una revisión automática señaló que la «bandeja de correo simulada» regalaba enlaces de recuperación a
+   cualquiera de la red: se corrigió (ahora solo la ve el computador del servidor o un Administrador).
+
+### Glosario (continuación)
+
+| Palabra técnica | Comparación |
+|---|---|
+| *servidor* | La oficina que atiende a todos y guarda los papeles |
+| *base de datos / SQLite* | El archivador compartido, en un solo archivo |
+| *cookie de sesión / HttpOnly* | El gafete que te dan al entrar y que el navegador no puede leer |
+| *hash scrypt con sal* | La huella de la contraseña: se puede comprobar, no se puede deshacer |
+| *trigger (disparador)* | Un candado automático: «si alguien intenta tachar el libro, se prohíbe» |
+| *consulta preparada* | Rellenar un formulario con huecos, para que lo escrito nunca se confunda con una orden |
+| *CSRF / Origin* | Revisar de dónde viene el pedido, para que otra página no lo mande a tu nombre |
+| *await / async* | «Espera la respuesta de la oficina antes de seguir» |
