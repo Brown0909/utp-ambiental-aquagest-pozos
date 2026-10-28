@@ -1,1 +1,4 @@
 .claude/
+
+# La base de datos del servidor nunca se sube (Spec 004)
+data/

@@ -4,6 +4,10 @@
   "type": "module",
   "description": "AquaGest + Pozos (UTP, Ingeniería Ambiental). Las pruebas importan los mismos módulos que carga el navegador.",
   "scripts": {
+    "start": "node server/index.js",
     "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }
