@@ -63,6 +63,6 @@ así que no hay dos versiones de las reglas que puedan separarse.
 
 ## Dudas abiertas
 
-1. ¿Qué versión de Node tienen Alex y Ethan? (necesitan 22.13 o más para correr el servidor).
+1. ¿Qué versión de Node tiene quien vaya a correr el servidor? (necesita 22.13 o más; solo ese computador la necesita).
 2. ¿Qué computador del grupo corre el servidor el jueves?
 3. ¿Se aprueba que esta rama (`spec-004-backend`, sobre la de Alex) se junte a `main` cuando pase la revisión?

@@ -102,3 +102,20 @@
    `docs/assets/normativa/`.
 5. **Lo que sigue pendiente:** confirmar que ninguna resolución posterior modificó el reglamento, y cargar los reglamentos de descarga
    y reutilización (hoy dicen «Límite no cargado», a propósito).
+
+## 28-oct-2026 (noche) — Una norma puede tener «parches»: la Resolución 122 de 2021
+
+> Antes era así: yo había dicho «no encontré ninguna modificación del reglamento». Ahora sabemos que sí existe una, y que Alex la había encontrado.
+
+### 🧒 Cómo funciona por dentro
+
+1. **Qué problema resuelve.** Una ley o norma no es un papel que se escribe una vez: se le pegan **parches** (modificaciones). Si solo lees la
+   versión original, puedes estar usando un número que ya cambió.
+2. **La lógica: el reglamento con enmiendas.** Es como un reglamento de edificio al que la junta le cambió 6 tablas en 2021. Para saber qué
+   vale hoy hay que leer el original **y** la enmienda. Alex encontró la enmienda; yo la leí en el PDF oficial de la ASEP.
+3. **El resultado.** Para los parámetros que usa la app (nitrato, coliformes, E. coli, pH, conductividad) **los números son los mismos** en 2019 y
+   en 2021: solo cambió que ahora se escribe «≤» (el valor permitido es el *máximo*). Por eso el código no cambió, pero sí su **cita**: ahora
+   dice «RT 21-2019 con la Res. 122/2021».
+4. **Qué pasaría si fallara y qué lo vigila.** Si un número hubiera cambiado, el árbitro (la app) habría dado un veredicto viejo. Lo vigilan las
+   168 pruebas de los límites y la evidencia guardada (imágenes de las tablas oficiales) en `docs/assets/normativa/`.
+5. **Lo que sigue pendiente:** confirmar si hubo otra modificación después de 2021 (la Gaceta bloquea las descargas automáticas).

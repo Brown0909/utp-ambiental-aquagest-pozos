@@ -17,9 +17,10 @@ contexto de lluvia (pronóstico vs. precipitación observada) y trazabilidad del
 ## Grupo
 
 - Alex Aguilar
-- Ethan González
 - José Brown
-- *(nombres del resto del grupo — pendientes, se agregan cuando los confirme José)*
+- Andry Sánchez
+- Anabely Abrego
+- Melanie Martinez
 
 ## ▶ Probar la aplicación (sin cuentas ni instalación)
 
@@ -66,7 +67,8 @@ npm start
 
 ## Contexto normativo (Panamá)
 
-- **Reglamento Técnico DGNTI-COPANIT 21-2019** — Valor Máximo Permitido de nitrato en agua potable (**10 mg/L como Nitrógeno**, verificado el 28-oct-2026 contra el texto oficial; ver [`docs/VERIFICACION-NORMATIVA.md`](docs/VERIFICACION-NORMATIVA.md)).
+- **Reglamento Técnico DGNTI-COPANIT 21-2019** (agua potable, **modificado por la Resolución 122 de 2021**) — nitrato ≤ 10 mg/L **como Nitrógeno**, verificado el 28-oct-2026 contra el texto oficial. La DGNTI-COPANIT 35-2000 no es de agua potable y ya no rige. Qué límites usa la aplicación y de dónde salen: [`docs/ACTUALIZACION-NORMATIVA.md`](docs/ACTUALIZACION-NORMATIVA.md) y [`docs/VERIFICACION-NORMATIVA.md`](docs/VERIFICACION-NORMATIVA.md) (con imágenes de las tablas oficiales).
+- **DGNTI-COPANIT 35-2019** (descargas) y **24-99** (reutilización): sus límites siguen **sin cargarse** («Límite no cargado»).
   Aplica a cualquier sistema de abastecimiento, incluidos los pozos rurales.
 - **Decreto Ejecutivo N.º 1839 (2014)** — marco regulatorio de las Juntas Administradoras de
   Acueductos Rurales (JAAR).

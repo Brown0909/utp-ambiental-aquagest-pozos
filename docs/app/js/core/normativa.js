@@ -1,6 +1,7 @@
 // Normativa aplicable y evaluación. Principio 9 de la constitución: NINGÚN límite se inventa.
 // Los límites cargados salen del texto oficial del RT DGNTI-COPANIT 21-2019 (Resolución N.º 35 del 6-may-2019, Gaceta Oficial
-// 28777-B), Tablas 1, 2 y 3, leído el 28-oct-2026 (ver docs/VERIFICACION-NORMATIVA.md). Todo lo demás dice «Límite no cargado».
+// 28777-B), con sus Tablas 1, 2 y 3 modificadas por la Resolución N.º 122 del 16-jul-2021 (Gaceta Oficial 29343, 2-ago-2021).
+// Verificado el 28-oct-2026 (ver docs/VERIFICACION-NORMATIVA.md y docs/ACTUALIZACION-NORMATIVA.md). Todo lo demás dice «Límite no cargado».
 import { convertirNitrato, FACTOR_NO3_A_NO3N, numTexto, etiquetaFormaCorta } from './units.js';
 
 export const TIPOS_AGUA = ['Agua potable', 'Agua superficial', 'Subterránea/Pozo', 'Agua residual', 'Agua residual tratada'];
@@ -14,7 +15,7 @@ export const PARAMETROS_LAB = {
 export const ORDEN_PARAMETROS = ['conductividad', 'coliformes_totales', 'e_coli', 'nitrato'];
 
 export const REGLAMENTOS = {
-  potable: { id: 'COPANIT 21-2019', nombre: 'DGNTI-COPANIT 21-2019 · Agua potable', verificacion: 'Límites verificados en el texto oficial del RT 21-2019 (Tablas 1, 2 y 3).' },
+  potable: { id: 'COPANIT 21-2019', nombre: 'DGNTI-COPANIT 21-2019 · Agua potable', verificacion: 'Límites verificados en el texto oficial del RT 21-2019 con la Res. 122/2021 (Tablas 1, 2 y 3).' },
   descarga: { id: 'COPANIT 35-2019', nombre: 'DGNTI-COPANIT 35-2019 · Descargas', verificacion: 'Límites no cargados: verificar en el reglamento.' },
   reutilizacion: { id: 'COPANIT 24-99', nombre: 'DGNTI-COPANIT 24-99 · Reutilización', verificacion: 'Límites no cargados: verificar en el reglamento.' },
 };

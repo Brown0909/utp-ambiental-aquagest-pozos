@@ -13,7 +13,17 @@ Aprobado por la **Resolución N.º 35 del 6 de mayo de 2019** del Ministerio de 
 
 Este reglamento **reemplaza** al DGNTI-COPANIT 23-395-99, de donde salían los límites que usaba la app hasta el 27-oct.
 
+**Modificación de 2021 (aportada por Alex Aguilar y verificada el 28-oct):** la **Resolución N.º 122 del 16 de julio de 2021**
+(Gaceta Oficial 29343, 2-ago-2021) **modifica las Tablas 1, 2, 3, 4, 5 y 7** y la definición 3.24 («valor permitido» pasa a ser el valor
+**máximo**). Texto consultado: copia de la ASEP,
+<https://asep.gob.pa/wp-content/uploads/agua/legislacion/dgnti_21-2019_mod.pdf> (escaneo de 4 páginas). **Para los parámetros que usa la
+app, los valores de 2019 y de 2021 son los mismos**; cambia la redacción (aparece «≤»). Imagen:
+[Tablas 1–3 con la Res. 122](assets/normativa/COPANIT-21-2019-Res122-2021_tablas1-3.jpg). Por eso la fuente vigente se cita como
+**«RT 21-2019 con la Res. 122/2021»**.
+
 ## Lo que dice el texto oficial y cómo está cargado en la app
+
+> Los valores de esta tabla son los de la Res. 35/2019 **y** los de la Res. 122/2021 (no cambiaron para estos parámetros).
 
 | Parámetro | Texto oficial | En la app (`normativa.js`) | Evidencia |
 |---|---|---|---|
@@ -37,9 +47,9 @@ Este reglamento **reemplaza** al DGNTI-COPANIT 23-395-99, de donde salían los l
 
 ## Lo que NO se pudo confirmar (dicho de frente)
 
-- **Vigencia actual:** no se encontró ninguna resolución que modifique el 21-2019, pero la búsqueda no equivale a una consulta
-  legal. Para cerrarlo hay que revisar en el archivo de la Gaceta Oficial las resoluciones posteriores del MICI que citen «21-2019»,
-  o preguntar a la DGNTI.
+- **Vigencia actual:** hoy (28-oct-2026) la última modificación que se conoce es la Res. 122/2021. Se buscó otra posterior y no
+  apareció, pero esa búsqueda no equivale a una consulta legal; para cerrarlo del todo, revisar en la Gaceta Oficial resoluciones
+  posteriores del MICI que citen «21-2019» o preguntar a la DGNTI. (El sitio de la Gaceta bloquea las descargas automáticas.)
 - **Lectura del escaneo:** los valores se leyeron a simple vista en imágenes de buena resolución. Cualquiera del grupo puede
   comprobarlos abriendo las imágenes de `docs/assets/normativa/` o el PDF del MINSA.
 - **Descarga (COPANIT 35-2019) y reutilización (24-99):** siguen **sin cargarse**; la app muestra «Límite no cargado».
