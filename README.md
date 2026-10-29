@@ -48,6 +48,7 @@ npm start
 - La base queda en `data/aquagest.db` (no se sube a GitHub). Copiar ese archivo es hacer un respaldo.
 - Variables opcionales: `PUERTO` (por defecto 3000), `AQUAGEST_DB` (otra ruta de base) y `AQUAGEST_DEMO=0` (apaga la
   bandeja de correo simulada pública; con `npm start` está encendida).
+- **Probarlo en tu propia computadora en 15 minutos (para Alex y el resto del grupo):** [`docs/GUIA-PARA-ALEX.md`](./docs/GUIA-PARA-ALEX.md).
 - Cómo probarlo entre dos computadoras en 10 minutos: [`docs/GUIA-PRUEBA-EN-PAREJA.md`](./docs/GUIA-PRUEBA-EN-PAREJA.md).
 
 > ⚠️ **Solo para la red local, nunca para el internet abierto.** Esta versión no tiene límite de ritmo por IP, no usa
