@@ -41,7 +41,7 @@ export function argumentosValidos(nombre, args) {
   return [...def.tipos].every((t, i) => (t === 's' ? typeof args[i] === 'string' : esObjeto(args[i])));
 }
 
-/** Los archivos llegan como {name,size,type,bytes}. El servidor nunca acepta una `url` del navegador (sería un enlace a su propia memoria). */
+/** Forma vieja (sin `archivoId`): llega {name,size,type,bytes} y se guardan solo 16 bytes. El servidor nunca acepta una `url` del navegador. */
 function limpiarArchivo(a) {
   if (!esObjeto(a)) return a;
   const bytes = Array.isArray(a.bytes) ? a.bytes.slice(0, 16).map(Number) : [];
@@ -52,8 +52,9 @@ const publico = (u) => ({ id: u.id, nombre: u.nombre, correo: u.correo, rol: u.r
 const MAX_INTENTOS_EN_MEMORIA = 5000;
 
 export class Almacen {
-  constructor({ base, demo = false, reloj = () => Date.now(), maxIntentosEnMemoria = MAX_INTENTOS_EN_MEMORIA }) {
+  constructor({ base, demo = false, reloj = () => Date.now(), maxIntentosEnMemoria = MAX_INTENTOS_EN_MEMORIA, archivos = null }) {
     this.base = base;
+    this.archivos = archivos;   // server/archivos.js; sin él, `{archivoId}` se rechaza
     this.maxIntentosEnMemoria = maxIntentosEnMemoria;
     this.demo = demo;
     this.reloj = reloj;
@@ -168,6 +169,7 @@ export class Almacen {
   ejecutar(userId, nombre, args) {
     let aplicar = [...args];
     let usuarioDelEnlace = null;
+    let archivoUsado = null;   // id del archivo subido que esta acción referencia
     if (nombre === 'restablecer') {
       // El enlace llega en claro; el núcleo lo compara con el hash que guardamos.
       const hash = sha256(args[0]);
@@ -175,12 +177,19 @@ export class Almacen {
       aplicar[0] = hash;
     } else if (nombre === 'importarHistorico' && Buffer.byteLength(args[1], 'utf8') > MAX_BYTES_CSV) {
       return fallo({ _form: 'El archivo supera 1 MB.' });   // RF-96: el mismo límite también aquí
-    } else if (nombre === 'crearMuestra') aplicar = [{ ...args[0], foto: limpiarArchivo(args[0].foto) }];
-    else if (nombre === 'guardarResultados') aplicar = [args[0], { ...args[1], certificado: limpiarArchivo(args[1].certificado) }];
+    } else if (nombre === 'crearMuestra' || nombre === 'guardarResultados') {
+      const [i, campo] = nombre === 'crearMuestra' ? [0, 'foto'] : [1, 'certificado'];
+      const ra = this.#archivoDeAccion(userId, campo, args[i][campo]);
+      if (ra.error) return fallo({ [campo]: ra.error });
+      aplicar[i] = { ...args[i], [campo]: ra.archivo };
+      archivoUsado = ra.id ?? null;
+    }
     try {
       const r = this.#como(userId, () => this.store[nombre](...aplicar));
       this.#normalizarSecretos();
       this.base.guardar(this.store.data, this.claves);
+      // RF-105: recién ahora, con la muestra ya guardada, el archivo queda «usado» y nadie más lo puede referenciar.
+      if (r.ok && archivoUsado) this.archivos.marcarUsado(archivoUsado);
       // Con la contraseña nueva, las sesiones abiertas de esa cuenta dejan de valer.
       if (nombre === 'restablecer' && r.ok && usuarioDelEnlace) this.base.cerrarSesionesDe(usuarioDelEnlace);
       return r;
@@ -188,6 +197,18 @@ export class Almacen {
       this.#recargar();   // la memoria nunca queda distinta de lo guardado
       throw err;
     }
+  }
+
+  /**
+   * RF-105/106: el campo foto/certificado de una acción. Con `{archivoId}` se resuelve contra el archivo GUARDADO (el navegador no
+   * decide tipo, tamaño, bytes ni `url`). Sin `archivoId` queda la forma vieja. Devuelve {archivo, id?} o {error}.
+   */
+  #archivoDeAccion(userId, campo, pedido) {
+    if (!esObjeto(pedido) || !Object.hasOwn(pedido, 'archivoId')) return { archivo: limpiarArchivo(pedido) };
+    if (!this.archivos) return { error: 'Este servidor no guarda archivos.' };
+    const r = this.archivos.resolver(pedido.archivoId, campo, userId);
+    if (!r.ok) return { error: r.error };
+    return { id: r.id, archivo: { ...r.archivo, demo: campo === 'certificado' && pedido.demo === true } };
   }
 
   /** M-19: estado de un enlace de recuperación. El navegador manda el enlace en claro; aquí se compara su hash. */

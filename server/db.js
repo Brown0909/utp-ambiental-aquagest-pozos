@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS historico (id TEXT PRIMARY KEY, punto_id TEXT NOT NUL
 CREATE TABLE IF NOT EXISTS tokens (hash TEXT PRIMARY KEY, usuario_id TEXT NOT NULL, vence INTEGER NOT NULL, usado INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS sesiones (hash TEXT PRIMARY KEY, usuario_id TEXT NOT NULL, creada TEXT NOT NULL, vence INTEGER NOT NULL, cerrada INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS accesos (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha TEXT NOT NULL, evento TEXT NOT NULL, cuenta_id TEXT, ip TEXT, navegador TEXT);
+-- Spec 005 (aditiva): metadatos de los archivos guardados en data/archivos/. El contenido vive en disco, no aquí.
+CREATE TABLE IF NOT EXISTS archivos (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, tipo_real TEXT NOT NULL, tamano INTEGER NOT NULL, nombre TEXT NOT NULL, subido_por TEXT NOT NULL, fecha TEXT NOT NULL, usado INTEGER NOT NULL DEFAULT 0);
 CREATE TRIGGER IF NOT EXISTS accesos_sin_cambios BEFORE UPDATE ON accesos BEGIN SELECT RAISE(ABORT, 'accesos es de solo agregar: no se puede modificar'); END;
 CREATE TRIGGER IF NOT EXISTS accesos_sin_borrado BEFORE DELETE ON accesos BEGIN SELECT RAISE(ABORT, 'accesos es de solo agregar: no se puede borrar'); END;
 `;
@@ -65,6 +67,9 @@ export class Base {
       sesion: this.db.prepare('SELECT usuario_id, vence, cerrada FROM sesiones WHERE hash = ?'),
       sesionCerrar: this.db.prepare('UPDATE sesiones SET cerrada = 1 WHERE hash = ?'),
       sesionesCerrarDe: this.db.prepare('UPDATE sesiones SET cerrada = 1 WHERE usuario_id = ?'),
+      archivoNuevo: this.db.prepare('INSERT INTO archivos (id, tipo, tipo_real, tamano, nombre, subido_por, fecha, usado) VALUES (?, ?, ?, ?, ?, ?, ?, 0)'),
+      archivo: this.db.prepare('SELECT id, tipo, tipo_real, tamano, nombre, subido_por, usado FROM archivos WHERE id = ?'),
+      archivoUsar: this.db.prepare('UPDATE archivos SET usado = 1 WHERE id = ? AND usado = 0'),
       acceso: this.db.prepare('INSERT INTO accesos (fecha, evento, cuenta_id, ip, navegador) VALUES (?, ?, ?, ?, ?)'),
     };
   }
@@ -138,5 +143,10 @@ export class Base {
   sesion(hash) { return this.q.sesion.get(hash) ?? null; }
   cerrarSesion(hash) { this.q.sesionCerrar.run(hash); }
   cerrarSesionesDe(usuarioId) { this.q.sesionesCerrarDe.run(usuarioId); }
+  // --- Archivos subidos (los usa archivos.js). Nunca se borra ni se reemplaza uno (RF-109): solo se marca como usado. ---
+  archivoNuevo(a) { this.q.archivoNuevo.run(a.id, a.tipo, a.tipoReal, a.tamano, a.nombre, a.subidoPor, a.fecha); }
+  archivo(id) { return this.q.archivo.get(id) ?? null; }
+  /** true si lo marcó (estaba libre); false si no existe o ya estaba usado. */
+  archivoUsar(id) { return this.q.archivoUsar.run(id).changes === 1; }
   anotarAcceso(fechaIso, evento, cuentaId, ip, navegador) { this.q.acceso.run(fechaIso, evento, cuentaId, ip, navegador); }
 }

@@ -1,11 +1,11 @@
-// Arranque del servidor: `npm start`. Variables: PUERTO (3000), AQUAGEST_DB (data/aquagest.db), AQUAGEST_DEMO (activa por defecto; 0 la apaga).
+// Arranque del servidor: `npm start`. Variables: PUERTO (3000), AQUAGEST_DB (data/aquagest.db), AQUAGEST_ARCHIVOS (data/archivos), AQUAGEST_DEMO (activa por defecto; 0 la apaga).
 // ⚠️ Solo para la red local del grupo: no tiene límite de ritmo por IP ni revisión de seguridad independiente.
 // NUNCA se debe abrir al internet (ver la advertencia del README).
 import { networkInterfaces } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Base } from './db.js';
-import { crearServidor } from './http.js';
+import { crearServidor, CARPETA_ARCHIVOS } from './http.js';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const puerto = Number(process.env.PUERTO ?? 3000);
@@ -19,7 +19,8 @@ if (!Number.isInteger(puerto) || puerto < 0 || puerto > 65535) {
 }
 
 const base = new Base(rutaBase);
-const { servidor } = crearServidor({ base, demo });
+const carpetaArchivos = process.env.AQUAGEST_ARCHIVOS ?? CARPETA_ARCHIVOS;
+const { servidor } = crearServidor({ base, demo, carpetaArchivos });
 
 servidor.on('error', (err) => {
   console.error(err.code === 'EADDRINUSE' ? `El puerto ${puerto} ya está en uso. Cierre el otro servidor o use otro: PUERTO=3001 npm start` : `No se pudo iniciar el servidor: ${err.message}`);
@@ -30,6 +31,7 @@ servidor.listen(puerto, '0.0.0.0', () => {
   const real = servidor.address().port;
   console.log('AquaGest MiAMBIENTE — servidor con base de datos');
   console.log(`  Base de datos: ${rutaBase}`);
+  console.log(`  Certificados y fotos: ${carpetaArchivos}  (para respaldar, copie la base Y esta carpeta)`);
   console.log(`  Modo demostración (bandeja de correo pública): ${demo ? 'SÍ' : 'no'}`);
   console.log('  Entre desde este computador:');
   console.log(`    http://localhost:${real}/app/`);

@@ -1,5 +1,6 @@
 // Servidor HTTP (módulo `node:http`, sin dependencias): sirve `docs/` y el API `/api/*` del contrato de plan.md.
 // Límites (RF-97): cuerpo máximo 1,5 MB (413), solo JSON (400), rechaza `Origin` ajeno (403).
+// Excepción única (Spec 005): `/api/archivo` recibe binario con su propio tope por tipo (foto 5 MB, certificado 10 MB).
 // Un rechazo de REGLA (permiso, validación) NO es error de transporte: llega con 200 y `{ok:false, ...}`.
 import http from 'node:http';
 import { createReadStream } from 'node:fs';
@@ -7,12 +8,15 @@ import { stat } from 'node:fs/promises';
 import { resolve, sep, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Almacen, ACCIONES, argumentosValidos } from './almacen.js';
+import { Archivos, TIPOS, MIME as MIME_ARCHIVO, idValido, nombreSeguro, MAX_NOMBRE } from './archivos.js';
 import { can } from '../docs/app/js/core/permissions.js';
 import { NOMBRE_COOKIE, VIGENCIA_SESION_MS, datosCliente } from './auth.js';
 
 export const MAX_CUERPO = 1.5 * 1024 * 1024;
 const MAX_DRENAJE = 8 * 1024 * 1024;   // si alguien sigue mandando mucho más, se corta la conexión
-const RAIZ_DOCS = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'docs');
+const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const RAIZ_DOCS = resolve(RAIZ, 'docs');
+export const CARPETA_ARCHIVOS = resolve(RAIZ, 'data', 'archivos');   // fuera de docs/ y cubierta por .gitignore (data/)
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -57,19 +61,22 @@ function origenPermitido(req) {
   try { return new URL(origen).host === req.headers.host; } catch { return false; }
 }
 
-/** Lee el cuerpo con tope. Si se pasa, sigue vaciando la conexión (para poder contestar 413) hasta un límite razonable. */
-function leerCuerpo(req) {
+/**
+ * Lee el cuerpo con tope. Si se pasa, deja de guardar trozos (no se acumula un cuerpo gigante) y sigue vaciando la conexión
+ * (para poder contestar 413) hasta `drenaje`. Con `binario` devuelve un Buffer en vez de texto (subida de archivos).
+ */
+function leerCuerpo(req, { tope = MAX_CUERPO, drenaje = MAX_DRENAJE, binario = false } = {}) {
   return new Promise((listo, fallo) => {
     let total = 0;
     let trozos = [];
     let excedido = false;
     req.on('data', (t) => {
       total += t.length;
-      if (!excedido && total > MAX_CUERPO) { excedido = true; trozos = []; }
+      if (!excedido && total > tope) { excedido = true; trozos = []; }
       if (!excedido) trozos.push(t);
-      if (total > MAX_DRENAJE) { req.pause(); listo({ excedido: true, cortar: true }); }
+      if (total > drenaje) { req.pause(); listo({ excedido: true, cortar: true }); }
     });
-    req.on('end', () => listo(excedido ? { excedido: true } : { texto: Buffer.concat(trozos).toString('utf8') }));
+    req.on('end', () => listo(excedido ? { excedido: true } : binario ? { buffer: Buffer.concat(trozos) } : { texto: Buffer.concat(trozos).toString('utf8') }));
     req.on('error', fallo);
   });
 }
@@ -84,7 +91,53 @@ export function puedeVerBandeja(req, almacen, idSesion) {
   return Boolean(idSesion) && can(almacen.store.usuarioPorId(idSesion), 'gestionar_usuarios');
 }
 
-async function api(req, res, ruta, almacen, demo) {
+/**
+ * POST /api/archivo (Spec 005). Cuerpo binario; `X-Tipo-Archivo` = foto|certificado y `X-Nombre-Archivo` (encodeURIComponent).
+ * Orden: sesión (401) → tipo y permiso → lectura con el tope PROPIO del tipo (413, sin guardar nada) → tipo real por contenido.
+ * El tope JSON de 1,5 MB y el filtro «solo JSON» del resto de rutas no se tocan.
+ */
+async function subirArchivo(req, res, almacen, archivos, soloPost, userId) {
+  if (!soloPost()) return;
+  if (!userId) return errorTransporte(res, 401, 'Debe iniciar sesión para hacer esto.', { sinSesion: true });
+  const rechazo = (mensaje) => {
+    if (req.headers['content-length'] !== '0') res.setHeader('Connection', 'close');   // no se leerá el cuerpo
+    return enviarJson(res, 200, { ok: false, errores: { archivo: mensaje } });
+  };
+  const tipo = String(req.headers['x-tipo-archivo'] ?? '');
+  const def = Object.hasOwn(TIPOS, tipo) ? TIPOS[tipo] : null;
+  if (!def) return rechazo('Tipo de archivo no válido.');
+  if (!can(almacen.store.usuarioPorId(userId), def.permiso)) return rechazo('Su rol no puede subir este tipo de archivo.');
+  let nombre = '';
+  try { nombre = decodeURIComponent(String(req.headers['x-nombre-archivo'] ?? '')); } catch { return rechazo('El nombre del archivo no es válido.'); }
+  if (nombre.length > MAX_NOMBRE) return rechazo(`El nombre del archivo supera ${MAX_NOMBRE} caracteres.`);
+  const cuerpo = await leerCuerpo(req, { tope: def.max, drenaje: def.max + 1048576, binario: true });
+  if (cuerpo.excedido) {
+    res.setHeader('Connection', 'close');
+    errorTransporte(res, 413, `El archivo es demasiado grande (máximo ${def.max / 1048576} MB).`);
+    if (cuerpo.cortar) res.on('finish', () => req.destroy());
+    return;
+  }
+  const r = archivos.guardar({ tipo, nombre, buffer: cuerpo.buffer, subidoPor: userId, fecha: new Date(almacen.reloj()).toISOString() });
+  if (!r.ok) return enviarJson(res, 200, { ok: false, errores: { archivo: r.error } });
+  enviarJson(res, 200, { ok: true, archivo: r.archivo });
+}
+
+/** GET /api/archivo/:id (RF-107): sesión + `consultar`. El id debe ser de 32 hex; nunca se arma una ruta con otra cosa. */
+async function bajarArchivo(res, almacen, archivos, soloGet, userId, id) {
+  if (!soloGet()) return;
+  if (!userId) return errorTransporte(res, 401, 'Debe iniciar sesión para hacer esto.', { sinSesion: true });
+  if (!can(almacen.store.usuarioPorId(userId), 'consultar')) return errorTransporte(res, 403, 'Su rol no puede consultar archivos.');
+  const f = idValido(id) ? await archivos.leer(id) : null;
+  if (!f) return errorTransporte(res, 404, 'No encontrado.');
+  const ext = f.meta.tipo_real;
+  res.writeHead(200, {
+    'Content-Type': MIME_ARCHIVO[ext], 'Content-Length': f.datos.length, 'X-Content-Type-Options': 'nosniff',
+    'Content-Disposition': `inline; filename="${nombreSeguro(f.meta.nombre, ext)}"`, 'Cache-Control': 'private, no-store',
+  });
+  res.end(f.datos);
+}
+
+async function api(req, res, ruta, almacen, demo, archivos) {
   const metodo = req.method;
   const cliente = datosCliente(req);
   const cookie = cookieDe(req);
@@ -108,6 +161,8 @@ async function api(req, res, ruta, almacen, demo) {
     if (!token || token.length > 200) return errorTransporte(res, 400, 'Enlace no válido.');
     return enviarJson(res, 200, { ok: true, estado: almacen.estadoToken(token) });
   }
+  if (ruta === '/api/archivo') return subirArchivo(req, res, almacen, archivos, soloPost, almacen.sesionDe(cookie, cliente));
+  if (ruta.startsWith('/api/archivo/')) return bajarArchivo(res, almacen, archivos, soloGet, almacen.sesionDe(cookie, cliente), ruta.slice('/api/archivo/'.length));
   if (ruta !== '/api/login' && ruta !== '/api/logout' && ruta !== '/api/accion') return errorTransporte(res, 404, 'No encontrado.');
   if (!soloPost()) return;
 
@@ -162,13 +217,14 @@ async function estatico(req, res, ruta, raiz) {
 }
 
 /** Crea el servidor. `base` es una Base de db.js; `reloj` se puede cambiar en las pruebas. */
-export function crearServidor({ base, demo = false, reloj = () => Date.now(), raizDocs = RAIZ_DOCS }) {
-  const almacen = new Almacen({ base, demo, reloj });
+export function crearServidor({ base, demo = false, reloj = () => Date.now(), raizDocs = RAIZ_DOCS, carpetaArchivos = CARPETA_ARCHIVOS }) {
+  const archivos = new Archivos({ base, carpeta: carpetaArchivos });
+  const almacen = new Almacen({ base, demo, reloj, archivos });
   const servidor = http.createServer(async (req, res) => {
     cabecerasBase(res);
     try {
       const ruta = new URL(req.url, 'http://servidor').pathname;
-      if (ruta === '/api' || ruta.startsWith('/api/')) await api(req, res, ruta, almacen, demo);
+      if (ruta === '/api' || ruta.startsWith('/api/')) await api(req, res, ruta, almacen, demo, archivos);
       else await estatico(req, res, ruta, raizDocs);
     } catch (err) {
       // RF-97: el navegador no recibe detalles; el detalle queda en la consola del servidor.
