@@ -119,3 +119,28 @@
 4. **Qué pasaría si fallara y qué lo vigila.** Si un número hubiera cambiado, el árbitro (la app) habría dado un veredicto viejo. Lo vigilan las
    168 pruebas de los límites y la evidencia guardada (imágenes de las tablas oficiales) en `docs/assets/normativa/`.
 5. **Lo que sigue pendiente:** confirmar si hubo otra modificación después de 2021 (la Gaceta bloquea las descargas automáticas).
+
+## 10-nov-2026 — Los certificados y las fotos ya se guardan de verdad (Spec 005)
+
+> Antes era así: del archivo solo se guardaba su nombre, su tamaño y los primeros 16 bytes (el archivo se tiraba). Ahora el archivo queda guardado y se puede volver a abrir.
+
+### 🧒 Cómo funciona por dentro
+
+1. **Qué problema resuelve.** Un laboratorio sube su certificado en PDF y, si el sistema solo apunta «subió un PDF», después no hay nada que mostrar. Ahora el archivo queda guardado.
+2. **La lógica: el archivador con casilleros.** La base de datos es la ficha («esta muestra tiene un certificado»); los archivos van en una **carpeta aparte** (`data\archivos\`), cada uno en un casillero con un **número secreto al azar** (32 letras y números). Nunca se usa el nombre que trae el archivo para ponerle nombre en el disco: así nadie puede esconder una ruta rara en el nombre.
+3. **Primero se sube, después se anota.** El navegador manda el archivo a la oficina (el servidor) por una puerta aparte y recibe el número del casillero; luego manda el formulario con **solo ese número**. Es como entregar el sobre en ventanilla y recibir un ticket.
+4. **El portero mira por dentro** (*verificación por contenido*): un PDF de verdad empieza con `%PDF`; una foto PNG o JPG tiene su propia «firma» al inicio. Un archivo de texto con nombre `.pdf` se rechaza. Y solo se acepta hasta 5 MB (foto) o 10 MB (certificado).
+5. **Quién puede qué.** Subir exige sesión y el permiso correcto (el técnico sube fotos, el laboratorio sube certificados); abrir exige sesión. El ticket solo sirve para **quien lo recibió** y **una vez** (*un archivo no se puede pegar a dos muestras*).
+6. **Nada se borra:** si alguien sube un archivo y no termina el formulario, el archivo queda en la carpeta sin usar. No hay orden de borrar.
+7. **Qué pasa si falla y qué lo vigila.** 191 pruebas, 23 son de archivos y cada una se verificó rompiendo el código a propósito. La sesión además lo recorrió en el navegador: foto visible, certificado descargable y todo siguió ahí tras reiniciar el servidor.
+8. **Para respaldar o mover la base** hay que copiar **dos cosas**: `data\aquagest.db` y la carpeta `data\archivos\`.
+
+### Glosario (continuación)
+
+| Palabra técnica | Comparación |
+|---|---|
+| *subida de archivo (upload)* | Entregar un sobre en ventanilla y recibir un ticket |
+| *identificador aleatorio* | El número de casillero que nadie puede adivinar |
+| *verificación por contenido / firma de archivo* | Mirar la «cédula» del archivo por dentro, no el nombre que trae |
+| *path traversal (`../`)* | Intentar escaparse de la carpeta con una ruta trucada; aquí se bloquea |
+| *nosniff* | Orden al navegador: «trata esto como lo que el servidor dice, no adivines» |
