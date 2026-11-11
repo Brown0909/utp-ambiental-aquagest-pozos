@@ -73,7 +73,7 @@ Hazlo en este orden, cambiando de usuario con «Cerrar sesión» (abajo a la izq
 1. En la ventana del servidor, **`Ctrl+C`** para apagarlo. Si intentas hacer algo en la página con el servidor apagado, debe avisarte que no hay conexión y **no perder lo que escribías**: es lo esperado.
 2. Vuélvelo a encender con `npm start`.
 3. **Recarga la página.** Debe seguir todo: tu pozo en «Puntos y pozos» y tu muestra en «Historial y reportes», con «Revisión confirmada».
-4. Los datos están en el archivo **`data\aquagest.db`**, dentro de la carpeta del proyecto.
+4. Los datos están en el archivo **`data\aquagest.db`**, dentro de la carpeta del proyecto. Los **certificados PDF y las fotos** que subas se guardan aparte, en la carpeta **`data\archivos\`**: para un respaldo hay que copiar **las dos cosas**, el archivo y la carpeta.
 
 ## Paso 6 — Cosas que deben RECHAZARSE (2 minutos)
 
@@ -101,5 +101,5 @@ la **ventana del servidor** (la terminal) y una captura de la pantalla con el er
 ## Lo que esta guía NO prueba
 
 - No prueba el celular ni dos computadoras a la vez (eso está en [`GUIA-PRUEBA-EN-PAREJA.md`](GUIA-PRUEBA-EN-PAREJA.md)).
-- Los certificados y fotos **no se guardan** (solo su nombre y tamaño): es una limitación conocida.
+- Los certificados y fotos **sí se guardan** en `data\archivos\` y se abren desde la muestra. Lo que no prueba esta guía es el límite de tamaño (foto 5 MB, certificado 10 MB).
 - No hay HTTPS ni revisión de seguridad independiente: **úsalo solo en tu red, nunca abierto a internet**.

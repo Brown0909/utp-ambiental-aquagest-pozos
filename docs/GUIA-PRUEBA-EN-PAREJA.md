@@ -70,7 +70,7 @@ Para comprobar a mano, entre **dos personas en dos computadoras**, que AquaGest 
 4. Las dos personas recargan la página y entran de nuevo.
    *Debe verse:* **el «Pozo de prueba», la muestra y la revisión confirmada siguen ahí.** Eso prueba que se guardaron en la base de datos.
 
-Para una prueba extra: busquen el archivo `data/aquagest.db` en la carpeta del proyecto. Ese archivo **es** la base de datos; copiarlo es hacer un respaldo. **No se sube a GitHub** (está en `.gitignore`).
+Para una prueba extra: busquen el archivo `data/aquagest.db` en la carpeta del proyecto. Ese archivo **es** la base de datos. Los certificados PDF y las fotos de las muestras se guardan aparte, en la carpeta `data/archivos/`; **para un respaldo copien las dos cosas** (el archivo y la carpeta). **Nada de `data/` se sube a GitHub** (está en `.gitignore`).
 
 ## Si algo no funciona
 
@@ -80,11 +80,11 @@ Para una prueba extra: busquen el archivo `data/aquagest.db` en la carpeta del p
 | «El puerto 3000 ya está en uso» | Cerrar el otro servidor, o usar otro puerto: en PowerShell `$env:PUERTO=3001; npm start`. |
 | La Computadora 2 no abre la dirección | Revisar que estén en la **misma red**, que la dirección tenga el puerto (`:3000`) y que el Firewall haya permitido el acceso. |
 | Sale «Origen no permitido» | Entren por la **misma dirección** que muestra el servidor (no por otro nombre). |
-| Quiero empezar de cero con los datos de ejemplo | Apaguen el servidor (Ctrl + C) y **muevan** `data/aquagest.db` a otra carpeta (no la borren si no están seguros); al encender se crea una base nueva. |
+| Quiero empezar de cero con los datos de ejemplo | Apaguen el servidor (Ctrl + C) y **muevan** `data/aquagest.db` **y** la carpeta `data/archivos/` a otro lado (no las borren si no están seguros); al encender se crea una base nueva. |
 | La clave se bloquea | Después de 5 intentos fallidos se bloquea esa cuenta 60 segundos. Esperen y prueben de nuevo. |
 
 ## Lo que esta guía NO prueba
 
-- Los **archivos** (la foto de la muestra y el certificado PDF) **no se guardan** en el servidor en esta versión: se guarda su nombre y tamaño, pero no el contenido.
+- Los **archivos** (la foto de la muestra y el certificado PDF) **sí se guardan** en el computador del servidor (`data/archivos/`) y se abren desde la muestra, también desde la otra PC. Prueben subir uno, cerrar sesión, entrar de nuevo y abrirlo.
 - No hay correo real: los «correos» se ven en la **bandeja simulada** (`…/app/#/bandeja`), solo mientras el servidor corre en modo demostración, y **solo desde el computador que corre el servidor** (o con una sesión de Administrador). Desde la otra PC, sin ser Administrador, la bandeja sale vacía a propósito: así nadie en la red puede robar un enlace de recuperación.
 - Desde **GitHub Pages** la aplicación sigue funcionando como demostración **sin guardar** nada (no hay servidor allí).

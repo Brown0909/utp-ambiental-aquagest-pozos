@@ -1,4 +1,5 @@
 // Selección de archivos: se leen los primeros bytes para que el store verifique el CONTENIDO (RF-38, RF-52).
+// Se conserva también el `File`: con el servidor (Spec 005) es lo que se sube; en demostración nadie lo usa.
 import { html, raw } from './dom.js';
 import { icono } from './icons.js';
 
@@ -6,7 +7,7 @@ export const tamanoTexto = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1).re
 
 export async function leerArchivo(file) {
   const cabecera = new Uint8Array(await file.slice(0, 16).arrayBuffer());
-  return { name: file.name, size: file.size, type: file.type, bytes: [...cabecera], url: URL.createObjectURL(file) };
+  return { name: file.name, size: file.size, type: file.type, bytes: [...cabecera], url: URL.createObjectURL(file), file };
 }
 
 export function zonaArchivo(nombre, etiqueta, { accept, ayuda, requerido = false, extra = '' }) {

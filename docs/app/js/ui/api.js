@@ -8,6 +8,7 @@ import { fallo } from '../core/result.js';
 export const INTERVALO_MS = 5000;           // RF-92: refresco cada 5 segundos
 const ESPERA_ESCRITURA_MS = 15000;
 const ESPERA_SALUD_MS = 3000;
+const ESPERA_SUBIDA_MS = 60000;   // un certificado puede pesar hasta 10 MB
 
 /** Las 16 escrituras que viajan al servidor (la lista blanca del servidor es la misma; allí se vuelve a comprobar). */
 export const ACCIONES_REMOTAS = [
@@ -24,8 +25,15 @@ const datosVacios = () => ({
 const MENSAJE_SIN_CONEXION = 'No hay conexión con el servidor. Lo que escribió sigue aquí: intente de nuevo en unos segundos.';
 const senal = (ms) => (typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined);
 
-/** Una `url` de archivo es un enlace temporal de ESTE navegador: no sirve en el servidor ni en otra computadora. */
-const sinUrl = (a) => (a && typeof a === 'object' ? { ...a, url: null } : a);
+/** Una `url` de archivo es un enlace temporal de ESTE navegador: no sirve en el servidor ni en otra computadora. El `File` tampoco viaja en el JSON. */
+const sinUrl = (a) => {
+  if (!a || typeof a !== 'object') return a;
+  const { file, ...resto } = a;
+  return { ...resto, url: null };
+};
+
+/** Archivo elegido -> id que el servidor le dio. Si la acción falla por OTRO campo y la persona reintenta, no se vuelve a subir. */
+const subidos = new WeakMap();
 
 export class AlmacenRemoto extends Store {
   constructor({ base, fetchFn = (...a) => globalThis.fetch(...a), avisar = () => {}, alActualizar = () => {} }) {
@@ -123,10 +131,53 @@ export class AlmacenRemoto extends Store {
   }
 
   /** Manda una escritura al servidor y devuelve lo mismo que devolvería el Store local: {ok, datos} o {ok:false, errores}. */
-  _accion(nombre, args) {
+  _accion(nombre, args, preparar = null) {
     const clave = nombre + JSON.stringify(args);
-    if (!this.enVuelo.has(clave)) this.enVuelo.set(clave, this._accionReal(nombre, args).finally(() => this.enVuelo.delete(clave)));
+    if (!this.enVuelo.has(clave)) {
+      // `preparar` (solo crearMuestra y guardarResultados) sube el archivo ANTES y devuelve los args definitivos, o un fallo.
+      const hacer = async () => {
+        let enviar = args;
+        if (preparar) { const p = await preparar(); if (p.fallo) return p.fallo; enviar = p.args; }
+        return this._accionReal(nombre, enviar);
+      };
+      this.enVuelo.set(clave, hacer().finally(() => this.enVuelo.delete(clave)));
+    }
     return this.enVuelo.get(clave);
+  }
+
+  /** Spec 005: sube el contenido del archivo (cuerpo binario). `campo` es 'foto' o 'certificado'. */
+  async _subir(campo, a) {
+    const r = await this.fetchFn(new URL('archivo', this.base), {
+      method: 'POST', credentials: 'same-origin', cache: 'no-store', signal: senal(ESPERA_SUBIDA_MS),
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Tipo-Archivo': campo, 'X-Nombre-Archivo': encodeURIComponent(a.name ?? '') },
+      body: a.file,
+    });
+    let json = null;
+    try { json = await r.json(); } catch { /* el servidor siempre contesta JSON */ }
+    this._recuperado();
+    return { status: r.status, json };
+  }
+
+  /**
+   * Lo que se manda en el campo foto/certificado de la acción. Con `File`: se sube y se manda `{archivoId}` (sin bytes ni url).
+   * Sin `File` (otro tipo de objeto, o ninguno): la forma de siempre. Devuelve {valor} o {fallo} (el error cae en el campo).
+   */
+  async _archivoParaAccion(campo, a) {
+    if (!a || typeof a !== 'object' || !a.file) return { valor: sinUrl(a) };
+    let id = subidos.get(a);
+    if (!id) {
+      let r;
+      try { r = await this._subir(campo, a); } catch { return { fallo: this._sinConexion() }; }
+      if (r.status === 401) {
+        await this.refrescar();
+        this.alActualizar({ sesionPerdida: true });
+        return { fallo: fallo({ _form: 'Su sesión terminó. Entre de nuevo.' }, { sinSesion: true }) };
+      }
+      if (!r.json?.ok || !r.json.archivo?.id) return { fallo: fallo({ [campo]: r.json?.errores?.archivo ?? r.json?.errores?._form ?? 'No se pudo subir el archivo. Intente de nuevo.' }) };
+      id = r.json.archivo.id;
+      subidos.set(a, id);
+    }
+    return { valor: { archivoId: id, ...(a.demo ? { demo: true } : {}) } };
   }
 
   async _accionReal(nombre, args) {
@@ -180,8 +231,18 @@ export class AlmacenRemoto extends Store {
 for (const nombre of ACCIONES_REMOTAS) {
   AlmacenRemoto.prototype[nombre] = function remota(...args) { return this._accion(nombre, args); };
 }
-AlmacenRemoto.prototype.crearMuestra = function crearMuestra(v) { return this._accion('crearMuestra', [{ ...v, foto: sinUrl(v?.foto) }]); };
-AlmacenRemoto.prototype.guardarResultados = function guardarResultados(folio, v) { return this._accion('guardarResultados', [folio, { ...v, certificado: sinUrl(v?.certificado) }]); };
+AlmacenRemoto.prototype.crearMuestra = function crearMuestra(v) {
+  return this._accion('crearMuestra', [{ ...v, foto: sinUrl(v?.foto) }], async () => {
+    const f = await this._archivoParaAccion('foto', v?.foto);
+    return f.fallo ? { fallo: f.fallo } : { args: [{ ...v, foto: f.valor }] };
+  });
+};
+AlmacenRemoto.prototype.guardarResultados = function guardarResultados(folio, v) {
+  return this._accion('guardarResultados', [folio, { ...v, certificado: sinUrl(v?.certificado) }], async () => {
+    const f = await this._archivoParaAccion('certificado', v?.certificado);
+    return f.fallo ? { fallo: f.fallo } : { args: [folio, { ...v, certificado: f.valor }] };
+  });
+};
 
 /** La API vive en `../api/` respecto a la página (en GitHub Pages esa ruta da 404 y se entra en modo demostración). */
 function baseDelApi() {

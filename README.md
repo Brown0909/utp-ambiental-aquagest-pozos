@@ -45,7 +45,9 @@ npm start
 
 - Necesita **Node 22.13 o más nuevo** (`node -v`). No hay que instalar nada más: no usa paquetes de npm.
 - Imprime la dirección para este computador (`http://localhost:3000/app/`) y la de **otros computadores de la misma red**.
-- La base queda en `data/aquagest.db` (no se sube a GitHub). Copiar ese archivo es hacer un respaldo.
+- La base queda en `data/aquagest.db` y los **certificados PDF y las fotos de campo** en la carpeta `data/archivos/` (nada de `data/` se sube a GitHub).
+  Cada archivo se guarda con un nombre aleatorio y se abre desde la muestra. **Para hacer un respaldo o llevar los datos a otra computadora hay que copiar las dos cosas:** `data/aquagest.db` **y** la carpeta `data/archivos/`; con solo la base, las muestras quedarían sin sus archivos.
+  Los topes son los de siempre: foto hasta 5 MB (JPG o PNG) y certificado hasta 10 MB (PDF); el tipo se comprueba por el contenido. Otra carpeta: variable `AQUAGEST_ARCHIVOS`.
 - Variables opcionales: `PUERTO` (por defecto 3000), `AQUAGEST_DB` (otra ruta de base) y `AQUAGEST_DEMO=0` (apaga la
   bandeja de correo simulada pública; con `npm start` está encendida).
 - **Probarlo en tu propia computadora en 15 minutos (para Alex y el resto del grupo):** [`docs/GUIA-PARA-ALEX.md`](./docs/GUIA-PARA-ALEX.md).

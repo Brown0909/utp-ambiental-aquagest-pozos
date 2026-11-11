@@ -20,5 +20,5 @@ export function certificadoDemo(m, puntoNombre) {
   const buf = doc.output('arraybuffer');
   const bytes = new Uint8Array(buf);
   const blob = new Blob([buf], { type: 'application/pdf' });
-  return { name: `certificado_${m.folio}.pdf`, size: bytes.length, type: 'application/pdf', bytes: [...bytes.slice(0, 16)], url: URL.createObjectURL(blob), demo: true };
+  return { name: `certificado_${m.folio}.pdf`, size: bytes.length, type: 'application/pdf', bytes: [...bytes.slice(0, 16)], url: URL.createObjectURL(blob), demo: true, file: blob };   // `file`: lo que se sube al servidor, igual que un PDF elegido
 }
