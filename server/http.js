@@ -32,7 +32,9 @@ const sinSecretos = (clave, valor) => (SECRETOS.has(clave) ? undefined : valor);
 function cabecerasBase(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'no-referrer');
+  // Con «no-referrer» el navegador no dice de dónde viene y OpenStreetMap bloquea los mosaicos del mapa (403, su política de uso).
+  // Solo se envía el DOMINIO de origen a sitios externos, nunca la ruta ni datos.
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 }
 
 function enviarJson(res, estado, cuerpo, extra = {}) {
